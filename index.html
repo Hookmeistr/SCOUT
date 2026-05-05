@@ -108,6 +108,7 @@ td:first-child{text-align:left}
 .vera-msg.user{background:var(--forest-mid);color:#fff;align-self:flex-end;border-radius:10px 10px 3px 10px}
 .vera-msg.vera{background:#fff;border:1px solid var(--border);align-self:flex-start;border-radius:10px 10px 10px 3px}
 .vera-msg.thinking{color:var(--text-muted);font-style:italic;background:#fff;border:1px solid var(--border);align-self:flex-start}
+.vera-msg.waking{color:#8a4400;font-style:italic;background:#fff3cd;border:1px solid var(--amber);align-self:flex-start;font-weight:600}
 .vera-input-row{display:flex;gap:8px}
 #vera-input{flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none}
 #vera-input:focus{border-color:var(--forest-mid)}
@@ -1044,20 +1045,38 @@ async function sendVera(){
   appendVeraMsg('user',query);
   const thinking=appendVeraMsg('vera','Working on it\u2026','thinking');
   let retries=0;
+  let countdownInterval=null;
   const tryFetch=async()=>{
     try{
       const res=await fetch(`${BACKEND}/api/vera`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,context:`User researching pickup trucks. SCOUT database: ${TRUCKS.map(t=>t.name).join(', ')}. SCOUT evaluates 8 categories: reliability, ownership cost, known issues, towing, safety, theft risk, value, availability.`})});
       if(!res.ok)throw new Error('not ok');
+      if(countdownInterval){clearInterval(countdownInterval);countdownInterval=null;}
       const data=await res.json();
       thinking.remove();
       appendVeraMsg('vera',data.result||'Something went wrong. Try again.');
     }catch{
       if(retries<2){
         retries++;
+        if(countdownInterval){clearInterval(countdownInterval);countdownInterval=null;}
         const delay=retries===1?30000:15000;
-        thinking.textContent=retries===1?'Server is waking up \u2014 this takes about 30 seconds on first use\u2026':'Almost there\u2026';
+        const secs=delay/1000;
+        let remaining=secs;
+        thinking.className='vera-msg waking';
+        const updateMsg=()=>{
+          thinking.textContent=`\u26a0\ufe0f Server is waking up \u2014 ${remaining}s remaining\u2026`;
+        };
+        updateMsg();
+        countdownInterval=setInterval(()=>{
+          remaining--;
+          if(remaining<=0){clearInterval(countdownInterval);countdownInterval=null;thinking.textContent='\u23f3 Almost there\u2026';thinking.className='vera-msg thinking';}
+          else updateMsg();
+        },1000);
         setTimeout(tryFetch,delay);
-      }else{thinking.remove();appendVeraMsg('vera','Server is not responding. This usually means it\u2019s still starting up \u2014 wait 30 seconds and try again.');}
+      }else{
+        if(countdownInterval){clearInterval(countdownInterval);countdownInterval=null;}
+        thinking.remove();
+        appendVeraMsg('vera','\u26a0\ufe0f Server didn\u2019t respond in time. Tap Ask again \u2014 it should be warmed up now.');
+      }
     }
   };
   tryFetch();
