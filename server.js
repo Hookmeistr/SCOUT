@@ -6,26 +6,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
-// CORS — allow GitHub Pages, local dev, and local file opens (null origin)
-app.use(cors({
-  origin: function(origin, callback) {
-    const allowed = [
-      'https://hookmeistr.github.io',
-      'http://localhost:3000',
-      'http://127.0.0.1:5500',
-      'http://localhost:5500',
-      'http://localhost:8080',
-    ];
-    // Allow null origin (file:// direct opens) and listed origins
-    if (!origin || allowed.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type']
-}));
+// CORS — open to all origins (rate limiting is the protection layer, not CORS)
+app.use(cors());
 
 app.use(express.json({ limit: '10mb' })); // 10mb to handle base64 VIN photos
 
