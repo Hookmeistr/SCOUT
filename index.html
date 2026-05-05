@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1e4d2b">
+<meta name="description" content="SCOUT — Smart Comparison & Ownership Understanding Tool. Vehicle research and buying intelligence.">
+<title>SCOUT — Vehicle Research Intelligence</title>
+<link rel="manifest" href="#" id="manifest-link">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{--dark:#1e1e1e;--forest-mid:#2d6a4f;--forest-dark:#1e4d2b;--sky:#2b7bb9;--amber:#c97d1a;--forest-light:#d8efe3;--cream:#f7f5f0;--good:#1e7145;--warn:#c97d1a;--bad:#b03030;--text:#1e1e1e;--text-muted:#5a5a5a;--border:#d0ccc4;--card-bg:#fff;--page-bg:#f7f5f0;--header-h:58px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--page-bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.5}
+#app-header{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--forest-dark);height:var(--header-h);display:flex;align-items:center;padding:0 16px;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.logo-mark{width:36px;height:36px;flex-shrink:0}
+.logo-mark svg{width:36px;height:36px}
+.logo-text{color:#fff;font-family:'DM Serif Display',serif;font-size:20px;letter-spacing:.04em}
+.logo-text span{color:var(--amber)}
+.logo-sub{font-size:9px;color:rgba(255,255,255,.4);letter-spacing:.06em;display:block;margin-top:-2px}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.btn-icon{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:6px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px}
+.btn-icon:hover{background:rgba(255,255,255,.18)}
+#tab-bar{position:fixed;top:var(--header-h);left:0;right:0;z-index:99;background:var(--forest-dark);border-bottom:2px solid var(--forest-mid);display:flex;overflow-x:auto;scrollbar-width:none}
+#tab-bar::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:10px 14px;color:rgba(255,255,255,.55);font-size:12px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:color .15s,border-color .15s;letter-spacing:.03em;text-transform:uppercase}
+.tab.active{color:var(--amber);border-bottom-color:var(--amber)}
+.tab:hover:not(.active){color:rgba(255,255,255,.85)}
+#main{padding-top:calc(var(--header-h) + 42px);min-height:100vh}
+.tab-panel{display:none;padding:16px;max-width:1100px;margin:0 auto}
+.tab-panel.active{display:block}
+.card{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px}
+.card-title{font-family:'DM Serif Display',serif;font-size:17px;color:var(--forest-dark);margin-bottom:8px}
+.btn{padding:7px 14px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+.btn-primary{background:var(--forest-mid);color:#fff}
+.btn-primary:hover{background:var(--forest-dark)}
+.btn-secondary{background:#fff;color:var(--forest-dark);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--forest-light)}
+.btn-amber{background:var(--amber);color:#fff}
+.btn-amber:hover{background:#a96a14}
+.scout-pick{background:linear-gradient(135deg,var(--forest-dark),#1a5f3a);border:2px solid var(--amber);border-radius:10px;padding:14px 18px;margin-bottom:14px;color:#fff}
+.scout-pick-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:8px}
+.scout-pick-title{font-family:'DM Serif Display',serif;font-size:18px;margin-bottom:6px}
+.scout-pick-body{font-size:13px;color:rgba(255,255,255,.8);line-height:1.6}
+.scout-pick-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.scout-pick-item{background:rgba(255,255,255,.1);border-radius:6px;padding:8px 12px;font-size:12px;flex:1;min-width:160px}
+.scout-pick-item strong{display:block;color:var(--amber);font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.scorecard-controls{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.view-mode-badge{margin-left:auto;font-size:12px;color:var(--text-muted);background:var(--forest-light);padding:4px 10px;border-radius:20px;cursor:pointer;border:1px solid var(--border)}
+.view-mode-badge:hover{background:#c2e4d2}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;min-width:760px}
+thead{background:var(--forest-dark)}
+th{color:rgba(255,255,255,.85);font-size:10px;font-weight:600;padding:9px 6px;text-align:center;cursor:pointer;white-space:nowrap;letter-spacing:.05em;text-transform:uppercase;user-select:none}
+th:first-child{text-align:left;min-width:120px}
+th .sort-arrow{margin-left:2px;opacity:.5}
+th.sorted .sort-arrow{opacity:1;color:var(--amber)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:hover{background:#f0ede8}
+tbody tr:last-child{border-bottom:none}
+td{padding:7px 6px;text-align:center;vertical-align:middle}
+td:first-child{text-align:left}
+.truck-name-cell{font-weight:600;color:var(--sky);cursor:pointer}
+.truck-name-cell:hover{text-decoration:underline}
+.grade{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:5px;font-weight:700;font-size:13px;cursor:pointer;transition:transform .1s;border:none}
+.grade:hover{transform:scale(1.12)}
+.grade-A{background:#1e7145;color:#fff}
+.grade-B{background:#1a5f8a;color:#fff}
+.grade-C{background:#856400;color:#fff}
+.grade-D{background:#8a3a00;color:#fff}
+.grade-F{background:#8a0000;color:#fff}
+.inline-detail{background:var(--forest-light);border-radius:6px;padding:8px 12px;margin-top:4px;font-size:13px;color:var(--text);display:none;text-align:left}
+.inline-detail.open{display:block}
+.rescout-check{width:16px;height:16px;cursor:pointer;accent-color:var(--forest-mid)}
+.timestamp{font-size:10px;color:var(--text-muted);margin-top:2px}
+#profile-page{display:none;padding:16px;max-width:900px;margin:0 auto;padding-top:calc(var(--header-h) + 42px)}
+#profile-page.active{display:block}
+.profile-back{display:inline-flex;align-items:center;gap:6px;color:var(--sky);cursor:pointer;font-size:14px;margin-bottom:14px;font-weight:600}
+.profile-back:hover{text-decoration:underline}
+.profile-header{background:var(--forest-dark);color:#fff;border-radius:10px;padding:20px;margin-bottom:14px}
+.profile-header h1{font-family:'DM Serif Display',serif;font-size:24px;margin-bottom:4px}
+.profile-subhead{color:rgba(255,255,255,.65);font-size:13px}
+.profile-grades{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.profile-grade-item{text-align:center}
+.profile-grade-label{font-size:9px;color:rgba(255,255,255,.6);margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em}
+.profile-grade-badge{width:36px;height:36px;font-size:16px;border-radius:7px}
+.view-indicator{background:var(--forest-light);border:1px solid var(--border);border-radius:6px;padding:8px 14px;margin-bottom:14px;font-size:13px;display:flex;align-items:center;gap:8px}
+.view-indicator a{color:var(--sky);cursor:pointer;text-decoration:underline}
+.profile-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--forest-mid);margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid var(--forest-light)}
+.modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.5);align-items:center;justify-content:center;padding:16px}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:12px;max-width:520px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.modal-header{background:var(--forest-dark);color:#fff;padding:14px 18px;border-radius:12px 12px 0 0;display:flex;align-items:center;justify-content:space-between}
+.modal-header h3{font-family:'DM Serif Display',serif;font-size:18px}
+.modal-close{background:none;border:none;color:#fff;font-size:20px;cursor:pointer}
+.modal-body{padding:16px 18px;font-size:14px;line-height:1.6}
+.vera-header{background:var(--forest-dark);color:#fff;border-radius:10px;padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:12px}
+.vera-avatar{width:44px;height:44px;border-radius:50%;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.vera-intro h2{font-family:'DM Serif Display',serif;font-size:20px}
+.vera-intro p{font-size:12px;color:rgba(255,255,255,.65);margin-top:2px}
+.vera-prompts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.vera-prompt-btn{background:#fff;border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;cursor:pointer;color:var(--text);transition:all .15s}
+.vera-prompt-btn:hover{background:var(--forest-light);border-color:var(--forest-mid)}
+#vera-chat{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;min-height:80px}
+.vera-msg{padding:10px 14px;border-radius:10px;font-size:14px;max-width:88%;line-height:1.55}
+.vera-msg.user{background:var(--forest-mid);color:#fff;align-self:flex-end;border-radius:10px 10px 3px 10px}
+.vera-msg.vera{background:#fff;border:1px solid var(--border);align-self:flex-start;border-radius:10px 10px 10px 3px}
+.vera-msg.thinking{color:var(--text-muted);font-style:italic;background:#fff;border:1px solid var(--border);align-self:flex-start}
+.vera-input-row{display:flex;gap:8px}
+#vera-input{flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none}
+#vera-input:focus{border-color:var(--forest-mid)}
+.vin-section{margin-bottom:16px}
+.vin-section-title{font-size:13px;font-weight:700;color:var(--forest-dark);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.badge-primary{background:var(--forest-mid);color:#fff;font-size:10px;padding:2px 7px;border-radius:10px}
+.badge-secondary{background:var(--border);color:var(--text-muted);font-size:10px;padding:2px 7px;border-radius:10px}
+#vin-camera-btn{width:100%;padding:20px;border:2px dashed var(--forest-mid);border-radius:10px;background:var(--forest-light);color:var(--forest-dark);font-size:15px;font-weight:600;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+#vin-camera-btn:hover{background:#c2e4d2}
+#vin-file-input{display:none}
+#vin-manual{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:15px;font-family:'DM Sans',sans-serif;letter-spacing:.1em;text-transform:uppercase;outline:none}
+#vin-manual:focus{border-color:var(--forest-mid)}
+#vin-result{margin-top:12px;padding:14px;border-radius:8px;display:none}
+#vin-result.active{display:block}
+.chart-wrap{position:relative;height:260px;margin-bottom:12px}
+.compare-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.compare-table th{background:var(--forest-dark);color:#fff;padding:8px 5px;text-align:center;font-size:10px;letter-spacing:.03em;text-transform:uppercase}
+.compare-table th:first-child{text-align:left;min-width:110px}
+.compare-table td{padding:7px 5px;border-bottom:1px solid var(--border);text-align:center;vertical-align:middle}
+.compare-table td:first-child{text-align:left;font-weight:600;color:var(--forest-dark);font-size:12px}
+.compare-table tr:last-child td{border-bottom:none}
+.compare-table tr:hover td{background:#f8f5f0}
+.cg{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:4px;font-weight:700;font-size:12px}
+.cg-A{background:#1e7145;color:#fff}
+.cg-B{background:#1a5f8a;color:#fff}
+.cg-C{background:#856400;color:#fff}
+.cg-D{background:#8a3a00;color:#fff}
+.cg-F{background:#8a0000;color:#fff}
+.settings-section{margin-bottom:20px}
+.settings-label{font-size:13px;font-weight:600;color:var(--forest-dark);margin-bottom:8px;display:block}
+.settings-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.toggle-btn{padding:7px 16px;border-radius:6px;font-size:13px;cursor:pointer;border:1px solid var(--border);background:#fff;color:var(--text);transition:all .15s}
+.toggle-btn.active{background:var(--forest-mid);color:#fff;border-color:var(--forest-mid)}
+.guide-section{margin-bottom:14px;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.guide-header{background:var(--forest-light);padding:12px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:600;color:var(--forest-dark);font-size:14px}
+.guide-header:hover{background:#c2e4d2}
+.guide-arrow{color:var(--amber);font-size:14px;flex-shrink:0;margin-left:8px;transition:transform .2s}
+.guide-body{display:none;padding:16px;font-size:14px;line-height:1.7;color:var(--text)}
+.guide-body.open{display:block}
+.guide-body p{margin-bottom:10px}
+.guide-body p:last-child{margin-bottom:0}
+.guide-body strong{color:var(--forest-dark)}
+.guide-body ul{margin:8px 0 10px 20px}
+.guide-body li{margin-bottom:4px}
+.warn-box{background:#fff3cd;border:1px solid #c97d1a;border-radius:6px;padding:10px 14px;margin:10px 0;font-size:13px}
+.warn-box strong{color:#856400}
+.info-box{background:var(--forest-light);border:1px solid var(--forest-mid);border-radius:6px;padding:10px 14px;margin:10px 0;font-size:13px}
+.data-table{width:100%;border-collapse:collapse;font-size:12px;margin:10px 0}
+.data-table th{background:var(--forest-dark);color:#fff;padding:7px 8px;text-align:left;font-size:11px}
+.data-table th:not(:first-child){text-align:center}
+.data-table td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:top}
+.data-table td:not(:first-child){text-align:center}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:#f8f5f0}
+.roadmap-item{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border)}
+.roadmap-item:last-child{border-bottom:none}
+.roadmap-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.dot-done{background:var(--good)}
+.dot-next{background:var(--amber)}
+.dot-future{background:var(--border)}
+.roadmap-text h4{font-size:14px;font-weight:600;margin-bottom:2px}
+.roadmap-text p{font-size:12px;color:var(--text-muted)}
+.donate-bar{background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 16px;display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:13px}
+.donate-bar a{margin-left:auto;background:#0070ba;color:#fff;padding:6px 14px;border-radius:6px;text-decoration:none;font-weight:600;font-size:12px}
+.text-muted{color:var(--text-muted);font-size:13px}
+.mt8{margin-top:8px}
+.info-pill{display:inline-flex;align-items:center;gap:4px;background:var(--forest-light);border-radius:20px;padding:3px 10px;font-size:12px;color:var(--forest-dark)}
+.section-intro{font-size:14px;color:var(--text-muted);margin-bottom:12px;line-height:1.6}
+#rate-bar{background:var(--forest-dark);color:rgba(255,255,255,.7);font-size:11px;text-align:center;padding:5px 8px;position:fixed;bottom:0;left:0;right:0;z-index:99;border-top:1px solid rgba(255,255,255,.1)}
+#rate-bar a{color:var(--amber);cursor:pointer;text-decoration:underline}
+#browser-notice{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:16px}
+#browser-notice.show{display:flex}
+.browser-notice-box{background:#fff;border-radius:12px;padding:20px;max-width:380px;width:100%;text-align:center}
+.browser-notice-box h3{font-family:'DM Serif Display',serif;margin-bottom:10px;color:var(--forest-dark)}
+.browser-notice-box p{font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.6}
+#nudge-toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:var(--dark);color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;z-index:150;display:none;align-items:center;gap:10px;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+#nudge-toast.show{display:flex}
+#nudge-toast button{background:var(--amber);border:none;color:#fff;padding:4px 10px;border-radius:10px;cursor:pointer;font-size:12px}
+@media(min-width:768px){.tab{padding:10px 18px}}
+@media(min-width:1024px){.tab-panel,#profile-page{padding:24px;padding-top:calc(var(--header-h) + 42px)}}
+</style>
+</head>
+<body>
+<div id="browser-notice"><div class="browser-notice-box"><h3>Best experience</h3><p><strong>Best:</strong> Chrome (Android), Safari (iOS)<br><strong>Good:</strong> Samsung Internet, Edge<br><strong>Works:</strong> Firefox<br><br>SCOUT uses camera access for VIN reading. Allow camera permissions when prompted.</p><button class="btn btn-primary" onclick="dismissBrowserNotice()">Got it</button></div></div>
+<header id="app-header">
+<div class="logo-mark"><svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="36" height="36" rx="8" fill="#1e4d2b"/><path d="M18 4 L32 10 L32 22 Q32 30 18 34 Q4 30 4 22 L4 10 Z" stroke="#c97d1a" stroke-width="1.5" fill="none"/><line x1="10" y1="30" x2="18" y2="10" stroke="#c97d1a" stroke-width="1.8" stroke-linecap="round"/><line x1="26" y1="30" x2="18" y2="10" stroke="#c97d1a" stroke-width="1.8" stroke-linecap="round"/><line x1="18" y1="30" x2="18" y2="20" stroke="#c97d1a" stroke-width="1.2" stroke-dasharray="2.5,2.5" stroke-linecap="round"/><line x1="18" y1="16" x2="18" y2="12" stroke="#c97d1a" stroke-width="1.2" stroke-dasharray="2.5,2.5" stroke-linecap="round"/><circle cx="18" cy="10" r="2" fill="#c97d1a"/></svg></div>
+<div><div class="logo-text">SC<span>OUT</span></div><span class="logo-sub">Smart Comparison &amp; Ownership Understanding Tool</span></div>
+<div class="header-right"><button class="btn-icon" onclick="showTab('settings')" title="Settings">&#9881;&#65039;</button></div>
+</header>
+<nav id="tab-bar">
+<div class="tab active" onclick="showTab('scorecard')">Scorecard</div>
+<div class="tab" onclick="showTab('charts')">Charts</div>
+<div class="tab" onclick="showTab('vin')">VIN Lookup</div>
+<div class="tab" onclick="showTab('vera')">VERA</div>
+<div class="tab" onclick="showTab('guide')">Guide</div>
+<div class="tab" onclick="showTab('roadmap')">Roadmap</div>
+<div class="tab" onclick="showTab('settings')">Settings</div>
+</nav>
+<main id="main">
+
+<!-- SCORECARD TAB -->
+<div class="tab-panel active" id="tab-scorecard">
+<div class="donate-bar"><span>&#128667; SCOUT is independent &mdash; no sponsors, no ads, ever.</span><a href="https://www.paypal.com/donate/?business=patrick.massengale%40gmail.com&currency_code=USD" target="_blank" rel="noopener">Support SCOUT &#9749;</a></div>
+
+<div class="scout-pick">
+<div class="scout-pick-label">&#127942; SCOUT's Pick — Overall Recommendations</div>
+<div class="scout-pick-title">Best truck depends on your class. Here's the verdict.</div>
+<div class="scout-pick-body">Based on IIHS safety data, HLDI theft statistics, RepairPal reliability, NHTSA recalls, and real-world ownership costs. No manufacturer relationships. No sponsored content.</div>
+<div class="scout-pick-row">
+<div class="scout-pick-item"><strong>1500-class — Best Overall</strong>Toyota Tundra (iForce MAX) — Only TSP+ safety rating, lowest theft, best reliability record, top resale.</div>
+<div class="scout-pick-item"><strong>1500-class — Best Value</strong>RAM 1500 — #1 RepairPal reliability, best ride, aggressive dealer discounts. Best used: 2020–2023.</div>
+<div class="scout-pick-item"><strong>2500-class — Both Scenarios</strong>RAM 2500 with 6.7L Cummins — Most legendary diesel. 1,075 lb-ft. 300K–400K mile examples documented.</div>
+<div class="scout-pick-item"><strong>3500-class — Best Overall</strong>RAM 3500 HO Cummins DRW (new) or F-350 6.7L Powerstroke DRW (used 2015–2020).</div>
+</div>
+</div>
+
+<div class="scorecard-controls">
+<button class="btn btn-secondary" onclick="toggleAllSelect()">&#9744; Select all</button>
+<button class="btn btn-amber" onclick="batchRescout()">Re-SCOUT selected</button>
+<div class="view-mode-badge" onclick="toggleViewMode()" id="view-badge">&#128203; Summary &mdash; tap to switch</div>
+</div>
+<div class="table-wrap"><table id="scorecard-table"><thead><tr>
+<th style="text-align:left" onclick="sortTable('name')">Truck <span class="sort-arrow">&#8597;</span></th>
+<th onclick="sortTable('reliability')">Reliability <span class="sort-arrow">&#8597;</span></th>
+<th onclick="sortTable('ownership_cost')">Own. Cost <span class="sort-arrow">&#8597;</span></th>
+<th onclick="sortTable('known_issues')">Known Issues <span class="sort-arrow">&#8597;</span></th>
+<th onclick="sortTable('towing')">Towing <span class="sort-arrow">&#8597;</span></th>
+<th onclick="sortTable('safety')">Safety <span class="sort-arrow">&#8597;</span></th>
+<th onclick="sortTable('theft_risk')">Theft Risk <span class="sort-arrow">&#8597;</span></th>
+<th onclick="sortTable('value')">Value <span class="sort-arrow">&#8597;</span></th>
+<th onclick="sortTable('availability')">Avail. <span class="sort-arrow">&#8597;</span></th>
+<th>Re-SCOUT</th>
+</tr></thead><tbody id="scorecard-body"></tbody></table></div>
+<p class="text-muted mt8" style="font-size:11px;"><span class="info-pill">&#128202; Built-in research</span> Grades from IIHS, NICB/HLDI, RepairPal, NHTSA, owner forums. Tap any grade for details. Tap truck name for full profile.</p>
+</div>
+
+<!-- CHARTS TAB -->
+<div class="tab-panel" id="tab-charts">
+<div class="card"><div class="card-title">Annual ownership cost comparison</div><p class="text-muted" style="font-size:13px;margin-bottom:12px;">Estimated annual costs: fuel, insurance, maintenance, depreciation. Based on 15,000 miles/year average use.</p><div class="chart-wrap"><canvas id="cost-chart"></canvas></div></div>
+<div class="card"><div class="card-title">5-year total cost of ownership</div><p class="text-muted" style="font-size:13px;margin-bottom:12px;">Includes purchase price depreciation, fuel, maintenance, insurance over 5 years / 75,000 miles.</p><div class="chart-wrap"><canvas id="tco-chart"></canvas></div></div>
+<div class="card"><div class="card-title">Head-to-head grade comparison — all 8 categories</div><p class="text-muted" style="font-size:13px;margin-bottom:10px;">All trucks scored side by side. A = best, F = worst. Tap any grade for details.</p><div class="table-wrap"><table class="compare-table" id="compare-table"></table></div></div>
+</div>
+
+<!-- VIN TAB -->
+<div class="tab-panel" id="tab-vin">
+<div class="card"><div class="card-title">VIN Lookup</div>
+<p class="section-intro">Decode any vehicle's history, recalls, and specs. Cross-referenced against SCOUT's good/bad year database. Works for trucks, SUVs, cars, and motorcycles.</p>
+<div class="vin-section"><div class="vin-section-title">&#128247; Photo scan <span class="badge-primary">Primary</span></div>
+<button id="vin-camera-btn" onclick="document.getElementById('vin-file-input').click()"><span style="font-size:30px">&#128247;</span><span>Tap to photograph VIN plate</span><span style="font-size:11px;font-weight:400;color:var(--text-muted)">Claude AI reads VIN from photo</span></button>
+<input type="file" id="vin-file-input" accept="image/*" capture="environment" onchange="handleVinPhoto(this)"></div>
+<div class="vin-section"><div class="vin-section-title">&#9000;&#65039; Manual entry <span class="badge-secondary">Backup</span></div>
+<div style="display:flex;gap:8px"><input type="text" id="vin-manual" placeholder="Enter 17-character VIN" maxlength="17"><button class="btn btn-primary" onclick="lookupVin(document.getElementById('vin-manual').value)">Look up</button></div></div>
+<div id="vin-result"></div>
+<div class="text-muted mt8" style="font-size:12px;">Photo scans: <strong id="vin-uses">3</strong> of 3 remaining today &middot; NHTSA text lookups: unlimited &middot; Works for any vehicle type.</div></div>
+</div>
+
+<!-- VERA TAB -->
+<div class="tab-panel" id="tab-vera">
+<div class="vera-header"><div class="vera-avatar">&#129517;</div><div class="vera-intro"><h2>VERA</h2><p>Vehicle Expert &amp; Research Assistant &mdash; the AI intelligence layer inside SCOUT. Ask anything about trucks, SUVs, or cars. Your question, her answer.</p></div></div>
+<div class="vera-prompts">
+<button class="vera-prompt-btn" onclick="veraQuickPrompt(this)">Which truck should I buy for towing?</button>
+<button class="vera-prompt-btn" onclick="veraQuickPrompt(this)">Gas vs diesel &mdash; real numbers</button>
+<button class="vera-prompt-btn" onclick="veraQuickPrompt(this)">Best used truck under $35k</button>
+<button class="vera-prompt-btn" onclick="veraQuickPrompt(this)">Worst years to avoid for Ford F-150</button>
+<button class="vera-prompt-btn" onclick="veraQuickPrompt(this)">When should I trade in my truck?</button>
+<button class="vera-prompt-btn" onclick="veraQuickPrompt(this)">Lease vs buy &mdash; honest breakdown</button>
+</div>
+<div id="vera-chat"></div>
+<div class="vera-input-row"><input type="text" id="vera-input" placeholder="Ask VERA anything about vehicles&hellip;" onkeydown="if(event.key==='Enter')sendVera()"><button class="btn btn-primary" onclick="sendVera()">Ask</button></div>
+<p class="text-muted mt8" style="font-size:12px;"><span class="info-pill">&#129302; AI-researched on demand</span> VERA uses AI. Responses count toward your daily limit. 3 per 24 hours on free tier.</p>
+</div>
+
+<!-- GUIDE TAB -->
+<div class="tab-panel" id="tab-guide">
+<div style="margin-bottom:12px">
+<h2 style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--forest-dark);margin-bottom:4px;">Pickup truck buyer's guide</h2>
+<p class="section-intro">Real-world research &mdash; not manufacturer marketing. Use this before you set foot on a lot. Data from IIHS, NICB, HLDI, NHTSA, RepairPal, J.D. Power, Consumer Reports, Reddit truck forums, The Diesel Stop, PowerStroke Nation, GM-Trucks.com, Jalopnik, MotorTrend, and owner communities. Last updated May 2026.</p>
+<div class="info-box"><strong>Price research note:</strong> KBB consistently lags real transaction prices by 30&ndash;60 days. For selling: use Edmunds True Market Value (TMV) and CarGurus for actual recent transaction prices. For buying used: check Manheim auction data if accessible, or cross-reference Autotrader and Cars.com for what trucks are actually selling for versus listed at.</div>
+</div>
+<div id="guide-sections"></div>
+</div>
+
+<!-- ROADMAP TAB -->
+<div class="tab-panel" id="tab-roadmap">
+<div class="card"><div class="card-title">What's built &amp; what's coming</div><div id="roadmap-list"></div></div>
+<div class="card" style="margin-top:12px"><div class="card-title">About SCOUT</div>
+<p style="font-size:14px;line-height:1.7;color:var(--text-muted)">SCOUT (Smart Comparison &amp; Ownership Understanding Tool) is independent. No manufacturer relationships, no dealer partnerships, no sponsored content &mdash; ever. Grades are based on IIHS safety data, NICB/HLDI theft statistics, RepairPal reliability scores, NHTSA recall data, owner forums, and real-world maintenance records. VERA (Vehicle Expert &amp; Research Assistant) is the AI intelligence layer powered by Anthropic. Built by one person who got tired of biased car advice.</p></div>
+</div>
+
+<!-- SETTINGS TAB -->
+<div class="tab-panel" id="tab-settings">
+<div class="card"><div class="card-title">Display preferences</div>
+<div class="settings-section"><label class="settings-label">Default view mode</label><div class="settings-row"><button class="toggle-btn" id="set-summary" onclick="setViewDefault('summary')">Summary</button><button class="toggle-btn" id="set-detail" onclick="setViewDefault('detail')">Full detail</button></div><p class="text-muted" style="font-size:12px">Phone/tablet defaults to Summary. Desktop defaults to Full Detail.</p></div>
+<div class="settings-section"><label class="settings-label">Layout</label><div class="settings-row"><button class="toggle-btn active" id="layout-auto" onclick="setLayout('auto')">Auto-detect</button><button class="toggle-btn" id="layout-phone" onclick="setLayout('phone')">Phone</button><button class="toggle-btn" id="layout-tablet" onclick="setLayout('tablet')">Tablet</button><button class="toggle-btn" id="layout-desktop" onclick="setLayout('desktop')">Desktop</button></div></div></div>
+<div class="card"><div class="card-title">Usage</div><div style="font-size:13px;line-height:2;"><div>Re-SCOUTs used today: <strong id="set-rescout-count">&mdash;</strong> of 3</div><div>VIN photo scans used today: <strong id="set-vin-count">&mdash;</strong> of 3</div><div style="margin-top:4px;font-size:12px;color:var(--text-muted)">Resets every 24 hours. Preferences saved on this device only.</div></div></div>
+<div class="card"><div class="card-title">Data</div><button class="btn btn-secondary" onclick="clearAllData()" style="color:var(--bad);border-color:var(--bad)">Clear all saved data</button><p class="text-muted mt8" style="font-size:12px">Clears preferences, view settings, and re-SCOUT timestamps. Cannot be undone.</p></div>
+</div>
+
+</main>
+
+<!-- PROFILE PAGE -->
+<div id="profile-page">
+<div class="profile-back" onclick="closeProfile()">&larr; Back to scorecard</div>
+<div class="profile-header"><h1 id="profile-name">&mdash;</h1><div class="profile-subhead" id="profile-subhead">Full profile</div><div class="profile-grades" id="profile-grades"></div></div>
+<div class="view-indicator">Viewing: <strong id="view-mode-label">Summary</strong>&nbsp;&nbsp;<a onclick="toggleViewMode()" id="view-switch-link">Switch to Full Detail</a></div>
+<div id="profile-content"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="grade-modal" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-header"><h3 id="modal-title">&mdash;</h3><button class="modal-close" onclick="closeModal()">&#10005;</button></div><div class="modal-body" id="modal-body"></div></div></div>
+
+<!-- NUDGE TOAST -->
+<div id="nudge-toast"><span>Set Full Detail as default?</span><button onclick="setViewDefault('detail');hideNudge()">Yes</button><button onclick="hideNudge()" style="background:none;color:rgba(255,255,255,.6);font-size:12px">No thanks</button></div>
+
+<!-- RATE BAR -->
+<div id="rate-bar"><span id="rate-bar-text">Loading&hellip;</span>&nbsp;&middot;&nbsp;<a href="https://www.paypal.com/donate/?business=patrick.massengale%40gmail.com&currency_code=USD" target="_blank">Support SCOUT</a></div>
+<script>
+const BACKEND='https://scout-api-yg3y.onrender.com';
+const CATS=['reliability','ownership_cost','known_issues','towing','safety','theft_risk','value','availability'];
+const CAT_LABELS={reliability:'Reliability',ownership_cost:'Ownership cost',known_issues:'Known issues',towing:'Towing capacity',safety:'Safety',theft_risk:'Theft risk',value:'Value & resale',availability:'Availability'};
+const CAT_SHORT={reliability:'Reliability',ownership_cost:'Own. Cost',known_issues:'Known Issues',towing:'Towing',safety:'Safety',theft_risk:'Theft Risk',value:'Value',availability:'Avail.'};
+
+const TRUCKS=[
+{id:'f150',name:'Ford F-150',class:'1500',
+grades:{reliability:'B',ownership_cost:'B',known_issues:'C',towing:'A',safety:'B',theft_risk:'C',value:'B',availability:'A'},
+summary:{
+reliability:'Strong overall. Avoid 2021 early 3.5L production issues. 2022+ significantly improved. PowerBoost hybrid solid. 5.0 Coyote V8 is bulletproof.',
+ownership_cost:'Average for class. EcoBoost adds maintenance complexity — plugs every 60K, timing chain on pre-2018. Parts widely available. Insurance $1,800-2,400/yr average.',
+known_issues:'2018 is highest recall year — avoid used. 2021 early 3.5L EB gremlins. Pre-2018 3.5L timing chain tensioner weakness. Catalytic converter theft on 2.7L. Aluminum body (2015+) raises repair costs after body damage.',
+towing:'Best-in-class up to 14,000 lbs on Max Tow package. Real-world comfortable at 85-90% of rated. Integrated trailer brake controller standard on Lariat+.',
+safety:'Good IIHS scores. Rear passenger risk documented in moderate overlap test — not TSP+. Tundra is the only full-size TSP+ in 2025.',
+theft_risk:'Consistently top 2 most stolen truck in America. OBD port vulnerability and relay attack both apply. Catalytic converters on 2.7L actively targeted.',
+value:'Strong resale. XLT and Lariat are the sweet spot. SuperCrew 4x4 holds best. Avoid base XL for resale.',
+availability:'Most available full-size on the market. Ford sells ~750,000 F-150s annually. Largest dealer network in the country.'},
+detail:{
+reliability:'The 3.5L EcoBoost is proven after 2017 revisions — 2021 had early production gremlins, avoid that year used. The 5.0 Coyote V8 is bulletproof and simpler. PowerBoost hybrid has had no widespread issues. The aluminum body (2015+) saves weight but raises collision repair costs.',
+ownership_cost:'Oil changes ~$80-120 every 7,500-10K miles. EcoBoost plugs $250-350 every 60K. Timing chain $1,200-2,500 if needed on pre-2018 3.5L. Insurance averages $1,800-2,400/yr full coverage. EcoBoost adds maintenance complexity vs a simple V8.',
+known_issues:'2018 is the highest recall year for F-150 — avoid used. 2021 had early 3.5L EcoBoost production issues — avoid used. Pre-2018 3.5L timing chain tensioner weakness — verify service history. Bed step and power tailgate electronics fail but are cosmetic. Catalytic converters on 2.7L are actively targeted by thieves. 2015+ aluminum body raises repair costs after body damage significantly.',
+towing:'Max Tow Package (3.5L EB) rates at 14,000 lbs. Real-world comfortable limit: 11,000-12,000 lbs. Integrated Trailer Brake Controller standard on Lariat+. Check actual door sticker for payload — marketing numbers are ideal conditions.',
+safety:'2021+ IIHS: Good on most tests. Rear passenger risk in moderate overlap test is documented — a concern for family haulers. Toyota Tundra is the only full-size to earn TSP+ in 2025. BlueCruise hands-free available on Platinum/Limited.',
+theft_risk:'Top 1-2 most stolen truck in America. High value of F-150 parts drives chop shop demand. 2.7L catalytic converters targeted. OBD port lock ($30) + Faraday pouch ($15) are minimum deterrents. Apple AirTag in frame rail has led to recoveries.',
+value:'Resale excellent. XLT and Lariat are the sweet spot for used value. SuperCrew 4x4 holds best. Avoid fully-loaded Platinum — depreciation hits harder at top trim. 3-year residual ~55-60%.',
+availability:'Ford sells ~750,000 F-150s annually. Largest dealer network in the country. Parts availability excellent. Competition between dealers drives better pricing on new.'},
+annualCost:8200,tco5yr:52000,lastScout:null},
+
+{id:'ram1500',name:'RAM 1500',class:'1500',
+grades:{reliability:'B',ownership_cost:'B',known_issues:'B',towing:'B',safety:'B',theft_risk:'B',value:'A',availability:'B'},
+summary:{
+reliability:'RepairPal ranks RAM #1 in class for reliability. Solid after 2019 refresh. eTorque mild hybrid minimal issues. Coil-spring rear suspension is best-in-class for ride comfort.',
+ownership_cost:'Competitive costs. Air suspension on higher trims is the maintenance wildcard — compressor failures at 80-120K ($800-1,800). RAM now offers 10yr/100K powertrain warranty standard (2025+).',
+known_issues:'ZF 8-speed shudder on 2013-2018 (resolved 2019+). Air suspension compressor failures at 80-120K. Rear window/third brake light water intrusion on 2019-2022. Active instrument cluster recall on 2025-2026.',
+towing:'Up to 12,750 lbs with tow package. Real-world strong. Active-level suspension helps with trailer squat. RAM integrated trailer camera is genuinely useful.',
+safety:'Leads Big 3 in crash prevention systems. Not TSP+ but solid 5-star NHTSA. Standard collision prevention suite on all trims.',
+theft_risk:'Lower theft rate than F-150 and Silverado. Better catalytic converter placement. HEMI stolen for parts less frequently.',
+value:'Best resale in class currently. RAM runs aggressive conquest cash on new — $5,000-8,000 off MSRP common. Consistently top 1-2 in residual value.',
+availability:'Good inventory. Stellantis production reliable. Dealer network solid. RAM 1500 Classic still sold alongside new, creating pricing pressure.'},
+detail:{
+reliability:'The 5.7L HEMI is proven — 500,000-mile examples exist with proper maintenance. eTorque mild hybrid (belt-starter-generator) has been mostly trouble-free. Air suspension (Level 1/2 package) is the risk — compressor failures at 80-120K are well documented. ZF 8-speed transmission shudder resolved 2019+. RAM has the best ride in class due to coil-spring rear suspension — no other full-size uses this setup.',
+ownership_cost:'HEMI oil changes ~$90-130. Spark plugs at 30K (RAM spec). Air suspension compressor replacement $800-1,800 if needed. Insurance lower than F-150 on average. RAM 2025+ includes 10yr/100K powertrain warranty standard — reduces extended warranty value.',
+known_issues:'ZF 8-speed transmission documented shuddering and hunting 2013-2018 — updated programming resolved 2019+. Air suspension compressor failures at 80-120K are well-documented — avoid if you want simple. Rear window and third-brake-light water intrusion on 2019-2022 — if moisture reaches electronics, repairs escalate. Active recall on instrument cluster display blanking for 2025-2026. Infotainment glitches common complaints — typically software-resolvable under warranty.',
+towing:'5.7L HEMI with tow package: 12,750 lbs rated. Real-world comfortable at 10,000-11,000 lbs. Active-level suspension helps with trailer squat on equipped models. Integrated trailer camera standard on higher trims — useful.',
+safety:'2019+ IIHS ratings improved significantly. Leads Big 3 in crash prevention technology. Forward collision warning and automatic braking standard. 5-star NHTSA. Rear passenger risk same as class — Toyota Tundra is the only full-size that protects rear passengers well.',
+theft_risk:'Historically better theft profile than F-150. HEMI stolen for parts less frequently than EcoBoost. Catalytic converters better positioned by design. 2019+ improved door lock mechanisms.',
+value:'Consistently top 1-2 in residual value for full-size trucks. Aggressive conquest cash deals on new ($5,000-8,000 off common). Strong used market demand. RAM 1500 Classic sold alongside the newer truck creates additional pricing leverage.',
+availability:'Stellantis inventory solid. RAM 1500 Classic (older body) still sold alongside new generation. Dealer network covers most markets well.'},
+annualCost:8000,tco5yr:50500,lastScout:null},
+
+{id:'silverado1500',name:'Chevy Silverado 1500',class:'1500',
+grades:{reliability:'B',ownership_cost:'C',known_issues:'D',towing:'B',safety:'C',theft_risk:'C',value:'B',availability:'A'},
+summary:{
+reliability:'2022+ is a better generation. The 6.2L avoids AFM — get that engine. The 5.3L AFM lifter failure (2014-2021) is a documented $3K-6K risk that must be priced into any used purchase.',
+ownership_cost:'AFM lifter repair expensive. Infotainment failures common 2019-2021 ($800-1,200 to fix). Parts cheap but problems add up. GM electronics work requires dealer software.',
+known_issues:'5.3L AFM lifter failures 2014-2021 ($3K-6K repair — the defining known issue). 10-speed auto shudder/hesitation ongoing 2020+. Infotainment/cluster failures 2022-2026. GM keyless entry class action lawsuit — OBD vulnerability not resolved. 21,666 Silverados stolen in 2024.',
+towing:'Competitive at 13,300 lbs max with Max Trailering package. 6.2L required for full rating. 5.3L tops at ~11,500 lbs.',
+safety:'Worst of Big 3 on IIHS. Poor on small overlap test. Headlights rated Poor on halogen trims. Same platform as GMC Sierra — same safety concerns.',
+theft_risk:'High theft target. Class action over GM keyless OBD vulnerability ongoing and unresolved. OBD port lock is mandatory. Insurance 15-25% higher than average.',
+value:'Solid resale but behind RAM. GM historically offers larger new discounts, compressing used values. LTZ is the sweet spot for used value.',
+availability:'Excellent inventory. GM produces ~600,000 Silverados annually. Very large dealer network.'},
+detail:{
+reliability:'The 5.3L Ecotec3 had AFM (Active Fuel Management) lifter failures on 2014-2021 — $3,000-6,000 to repair. 2021+ DFM (Dynamic Fuel Management) is better but same concern applies. The 6.2L avoids AFM entirely — this is the engine to get. 3.0L Duramax diesel is excellent. Infotainment screen failures common 2019-2021.',
+ownership_cost:'5.3L AFM failure is expensive. The 6.2L eliminates that risk. Parts cheap. Extended warranty worth considering on 5.3L pre-2022. GM electronics warranty work requires dealer software — more dealer-dependent than other brands. Budget accordingly.',
+known_issues:'5.3L AFM lifter failures on 2014-2021 are the defining known issue — $3,000-6,000 to repair. The 6.2L does not have this problem. 10-speed automatic on gas models: documented shuddering and hesitation ongoing 2020+. Infotainment glitches and instrument cluster failures documented 2022-2026. GM keyless entry vulnerability: class action alleges GM knowingly failed to implement adequate anti-theft protections — OBD port vulnerability enabling key fob cloning not fully resolved. 21,666 Silverados stolen in 2024. OBD port lock is mandatory for any GM truck.',
+towing:'6.2L with Max Trailering: 13,300 lbs rated. 5.3L tops at ~11,500 lbs. Integrated brake controller standard on LTZ+.',
+safety:'IIHS rates Silverado Poor/Acceptable on small overlap. Headlights rated Poor on halogen trims. 2022 improvement is real but not TSP+. Consumer Reports repeatedly cites GM electronics as weakest area in class.',
+theft_risk:'Consistently top 5 most stolen nationally. OBD port vulnerability widely known in theft community — a $30-50 OBD lock is mandatory. Class action against GM ongoing. 15-25% higher insurance premiums than average.',
+value:'Resale good but GM historically offers larger new discounts, compressing used values. LTZ is best used value trim. The electronics issues reduce used GM confidence.',
+availability:'GM produces ~600,000 Silverados annually. Dealer network very large. Competitive new pricing.'},
+annualCost:8500,tco5yr:53000,lastScout:null},
+
+{id:'tundra',name:'Toyota Tundra',class:'1500',
+grades:{reliability:'A',ownership_cost:'B',known_issues:'A',towing:'B',safety:'A',theft_risk:'A',value:'B',availability:'C'},
+summary:{
+reliability:'Best long-term reliability in class by a meaningful margin. The 5.7L iForce V8 (2007-2021) is legendary — 300K+ miles documented. 2022+ twin-turbo V6 and iForce MAX hybrid have excellent early data.',
+ownership_cost:'Higher sticker, lower lifetime maintenance. Toyota dealers charge a premium but you go less often. No complex AFM system. Parts more expensive, labor typically lower.',
+known_issues:'2007-2008 cam tower oil sludge — Toyota issued extended warranty, verify documentation. Pre-2022 frame rust in rust-belt states. 2022+ generation has no significant documented failures at scale as of mid-2026. Cleanest known issues record of any full-size truck.',
+towing:'Up to 12,000 lbs. Behind F-150 and RAM on peak numbers but Toyota towing is honest — not ideal-condition marketing numbers. Payload above average.',
+safety:'ONLY full-size truck to earn IIHS TSP+ in 2025. Best rear passenger protection of any full-size truck. Toyota Safety Sense 2.5 standard on every trim.',
+theft_risk:'Lowest theft rate of any full-size truck. Not in NICB top 10. Insurance savings are real and meaningful — can offset some of the higher purchase price.',
+value:'Strong resale. New inventory limited — dealers rarely discount. Used Tundra holds value extremely well. 2021 and older V8s are unique used value opportunity post-2022 redesign.',
+availability:'Hardest full-size to find at MSRP. Dealer markup common on popular configs. Worth the patience for the right buyer.'},
+detail:{
+reliability:'The 5.7L iForce V8 (2007-2021) is legendary — 300,000+ miles with basic maintenance is well documented across owner communities. Avoid 2007-2008 cam tower sludge. The 2022+ 3.5L twin-turbo V6 (iForce MAX hybrid available) has excellent early reports. Toyota engineering conservatism means they typically get things right before launch. Fewer complex failure modes than any domestic competitor.',
+ownership_cost:'Toyota dealers charge a service premium but visits are less frequent. Oil changes ~$100-150. No complex AFM system to fail. Parts more expensive than domestic; labor typically lower because there is less to fix. Fewer unplanned repair visits translates to lower total lifetime cost.',
+known_issues:'2007-2008 cam tower oil sludge — Toyota issued extended warranty coverage. Verify documentation on any 2007-2008 in the used market. Pre-2022 frames in rust-belt states have documented rust issues — inspect thoroughly. The 2022+ generation iForce MAX hybrid system has had no significant documented failures at scale as of mid-2026. The turbo V6 replacing the V8 was initially controversial but has proven reliable. Parts cost higher than domestic brands; labor typically lower.',
+towing:'12,000 lbs max. Behind GM and Ford on peak numbers but Toyota towing is honest — not ideal-condition marketing. Payload above average. Integrated brake controller standard on SR5+.',
+safety:'TSP+ is a meaningful distinction — the only full-size truck with this rating in 2025. Toyota Safety Sense 2.5 standard on every trim. Best rear passenger protection of any full-size pickup in IIHS testing.',
+theft_risk:'Lowest theft rate of any full-size truck by a meaningful margin. Fewer Tundras on road + strong anti-theft design + lower parts demand = low target profile. Insurance savings can offset some of the higher purchase price.',
+value:'Used Tundra holds value extremely well. 2022 changeover created a used value opportunity for 2021 and older V8s. New Tundra: dealers are not discounting in most markets.',
+availability:'Toyota production constraints are real. MSRP deals are rare — expect $1,000-3,000 over on popular configs. Patience required and rewarded.'},
+annualCost:7800,tco5yr:51500,lastScout:null},
+
+{id:'titan',name:'Nissan Titan',class:'1500',
+grades:{reliability:'C',ownership_cost:'B',known_issues:'B',towing:'C',safety:'C',theft_risk:'A',value:'C',availability:'B'},
+summary:{
+reliability:'Stagnant since 2016 redesign. No hybrid. No diesel. Falls further behind the class each model year. Difficult to recommend as a primary purchase.',
+ownership_cost:'Simple naturally-aspirated V8 means lower maintenance costs. Lower sticker means lower loan amounts. Parts available but narrower than Big 3.',
+known_issues:'Relatively clean known issues record — the 5.6L V8 is straightforward and reliable. Primary concern is the product trajectory: no updates since 2016, no hybrid, no diesel, and Nissan has not committed to a next generation. Long-term parts uncertainty.',
+towing:'Max 9,700 lbs — lowest in full-size class. Not competitive for serious towing. The Titan XD (higher-capacity variant) was discontinued.',
+safety:'Not tested in 2025 IIHS cycle. Lacks modern ADAS features of class leaders. Basic forward collision warning on higher trims only.',
+theft_risk:'Lowest theft risk in full-size class — low sales volume means low theft interest. Not a target for professional theft operations.',
+value:'Lowest resale value in class. Difficult to recommend unless price is the only consideration.',
+availability:'Nissan dealer network adequate in most markets. Parts available. Declining product commitment is a concern for long-term ownership.'},
+detail:{
+reliability:'The 5.6L Endurance V8 is a solid engine but the rest of the truck has not kept pace. No significant updates since 2016. Nissan has not publicly committed to a next-generation Titan — this creates long-term uncertainty about parts availability and support.',
+ownership_cost:'Simple naturally-aspirated V8 means fewer complex failure modes. Lower sticker price means lower loan amounts. Parts available through Nissan network but narrower than domestic Big 3.',
+known_issues:'The Titan has a relatively clean known issues record — the 5.6L V8 is straightforward. The primary concern is not a mechanical failure mode but the product trajectory: no hybrid, no diesel, no significant updates since 2016, and Nissan has not publicly committed to a next generation. Long-term parts and support uncertainty is the real risk.',
+towing:'9,700 lbs max — lowest in full-size class. The Titan XD higher-capacity variant was discontinued. Any towing requirement beyond casual use makes other options significantly better.',
+safety:'Not included in 2025 IIHS testing cycle. Basic forward collision warning on higher trims. Lacks the comprehensive ADAS available on F-150, RAM, and Tundra.',
+theft_risk:'Low sales volume means low theft interest — not a target for organized theft. This is a genuine advantage from a security and insurance perspective.',
+value:'Resale value is the weakest in the full-size class. Difficult to recommend over RAM 1500 or F-150 at similar pricing. More recent is better than older.',
+availability:'Nissan dealer network adequate. Parts available but narrower ecosystem than domestic. Declining product commitment is a real long-term concern.'},
+annualCost:7600,tco5yr:49000,lastScout:null},
+
+{id:'sierra-hd',name:'GMC Sierra 2500 HD',class:'2500',
+grades:{reliability:'B',ownership_cost:'C',known_issues:'C',towing:'A',safety:'B',theft_risk:'D',value:'B',availability:'B'},
+summary:{
+reliability:'L5P Duramax diesel (2017+) is the best diesel engine in its class. Gas 6.6L V8 is workmanlike. Allison transmission is bulletproof. LML Duramax (2011-2016) had injector issues — resolved in L5P.',
+ownership_cost:'Diesel maintenance adds up — DEF (~$25 per 10K mi), DPF maintenance, injectors at high mileage. Budget $3K-6K extra over 150K miles vs gas. GM electronics require dealer software for warranty work.',
+known_issues:'LML Duramax injector failures 2011-2016 (L5P resolved). 10-speed gas auto shudder/hesitation ongoing 2020+. DEF system failures. GM keyless entry vulnerability applies to HD trucks. HLDI theft rate: 1,023x the national average.',
+towing:'Up to 36,000 lbs 5th wheel with Duramax + Allison. Conventional max 18,500 lbs. Class-leading numbers and honest.',
+safety:'Good ratings for a heavy truck. HD class not in standard IIHS pool. Blind spot monitoring important given truck size — available on higher trims.',
+theft_risk:'HIGHEST theft risk of any truck in America — HLDI rate 1,023x the national average. GPS tracker and OBD lock are not optional. Insurance significantly higher.',
+value:'Holds value well. Work truck demand keeps used market strong. Properly maintained Duramax commands significant premium.',
+availability:'Available but commercial buyer demand limits negotiation room. Factory order worth considering for exact spec.'},
+detail:{
+reliability:'The L5P Duramax (2017+) is the best diesel engine in its class — reliable, powerful, excellent longevity. 6.6L Vortec gas engine is simple and proven for those who do not need diesel. Allison transmission is genuinely bulletproof. LML Duramax (2011-2016) had documented injector failures at higher mileage — L5P resolved this. Avoid LML generation.',
+ownership_cost:'Diesel: DEF fluid, DPF maintenance, injectors at high mileage. Budget $3,000-6,000 extra over 150K miles vs gas. Tires on a 2500HD: $1,200-1,800 per set. GM electronics warranty work requires dealer software — more dealer-dependent than Ford or RAM.',
+known_issues:'LML Duramax (2011-2016) had documented injector failures — L5P (2017+) resolved this. 10-speed automatic on gas models: documented shuddering and hesitation complaints ongoing 2020+. DEF system failures do occur. GM keyless entry vulnerability applies to HD trucks as well — OBD port lock is mandatory. Avoid any unit with deleted emissions equipment (illegal, kills resale).',
+towing:'36,000 lbs 5th wheel with Duramax + Allison. Conventional max 18,500 lbs. Real numbers, not inflated. Exhaust brake essential for mountain driving under load.',
+safety:'IIHS rates HD trucks differently than light-duty. Standard GM safety suite. Blind spot monitoring available on higher trims — critically important given the truck footprint.',
+theft_risk:'HLDI theft rate 1,023x the national average — the highest of any truck in America. OBD port vulnerability widely known in theft community. GPS tracker required. Budget $300-500 minimum for a proper deterrent system.',
+value:'Strong resale driven by contractor and commercial demand. Properly maintained Duramax commands a significant premium in used market. Do not delete emissions equipment — kills resale.',
+availability:'HD trucks sell quickly, especially diesel. Commercial buyers move fast. Factory order worth considering for exact spec.'},
+annualCost:10500,tco5yr:65000,lastScout:null},
+
+{id:'f250',name:'Ford F-250 Super Duty',class:'2500',
+grades:{reliability:'B',ownership_cost:'C',known_issues:'C',towing:'A',safety:'B',theft_risk:'C',value:'B',availability:'B'},
+summary:{
+reliability:'6.7L Power Stroke diesel (2011+) is excellent. 7.3L Godzilla gas V8 (2020+) is exceptional — simple, durable, 430HP. NEVER buy a 6.0L (2003-2007) or 6.4L (2008-2010) Power Stroke without complete documented repair history.',
+ownership_cost:'Expensive to maintain properly. Budget for EGR cooler service on 6.7L ($800-1,500 preventive). Injector replacement at high mileage: $3,000-6,000. Done right, 300,000+ mile engines.',
+known_issues:'6.0L Powerstroke (2003-2007): EGR cooler, head gaskets, FICM failure — $3K-6K bulletproof or $10K-16K major repair. 6.4L (2008-2010): piston cracking, DPF issues, fuel dilution — Ford scrapped Navistar over this engine. 6.7L (2011+): EGR cooler is maintenance item, not failure mode.',
+towing:'Up to 40,000 lbs 5th wheel. 22,800 lbs conventional. Class-leading. The reason serious towers buy this truck.',
+safety:'Solid for an HD truck. Co-Pilot360 comprehensive on higher trims. HD class not in standard IIHS pool.',
+theft_risk:'High-value target but not top of NICB list like GMC HD. Still elevated — factor into insurance budget. GPS tracker and OBD lock still recommended.',
+value:'Strong resale. Power Stroke premium $3,000-6,000 in used market over comparable gas. Lariat 4x4 is the sweet spot for used value.',
+availability:'Good availability. Ford Super Duty production is high volume. Premium configs may require ordering or regional search.'},
+detail:{
+reliability:'The 6.7L Power Stroke (2011+) is an excellent engine when maintained. EGR cooler is the known weak point — address preventively at $800-1,500 and it is not a failure mode. The 6.0L (2003-2007) and 6.4L (2008-2010) are PROHIBITED without complete documented repair history. The 7.3L Godzilla gas V8 (2020+) is exceptional — simple, 430HP, no emissions complexity, highly recommended for those who do not need maximum diesel towing.',
+ownership_cost:'EGR cooler maintenance: budget for it proactively. Injector replacement at high mileage: $3,000-6,000. DEF fluid + DPF maintenance. Done right these engines go 300,000+ miles. Oil analysis every 7,500 miles recommended for diesels.',
+known_issues:'6.0L Power Stroke (2003-2007): EGR cooler failure, head gasket issues, FICM failure, oil cooler plugging. Budget $3,000-6,000 for bulletproofing or $10,000-16,000 for major repairs. Many mechanics love these engines because they generate steady revenue. 6.4L Power Stroke (2008-2010): DPF issues, radiator failures, piston cracking, fuel dilution of oil — Ford forum consensus is "150K +/- 50K mile engine." Ford itself scrapped the Navistar partnership over this engine. 6.7L Power Stroke (2011+): EGR cooler is a maintenance item — not a failure mode when addressed preventively. This is the engine to buy. 7.3L Godzilla V8 (2020+): no significant documented known issues.',
+towing:'F-250 with 6.7L and 5th wheel prep: up to 40,000 lbs DRW. Conventional max 22,800 lbs. Real-world comfortable long-haul: 20,000-25,000 lbs. Pro Trailer Backup Assist and exhaust brake essential for mountain towing.',
+safety:'Ford Co-Pilot360 comprehensive on higher trims. Pre-Collision Assist standard. Blind spot monitoring valuable given trailer length. HD class not in standard IIHS pool.',
+theft_risk:'Super Duty targeted less than GMC HD but still elevated. Catalytic converters less targeted on diesels. GPS tracker and OBD lock still recommended.',
+value:'Power Stroke premium $3,000-6,000 in used market over comparable gas. Lariat 4x4 sweet spot for used value. 7.3L Godzilla gas trucks priced lower but highly capable.',
+availability:'Ford produces Super Duty in high volumes. Premium diesel configs may require ordering. Strong commercial demand for HD trucks.'},
+annualCost:11000,tco5yr:67000,lastScout:null}
+];
+
+const GOOD_BAD_YEARS={
+'ford f-150':{good:[2022,2023,2024,2025],bad:[2018,2021,2004,2005,2006],notes:'Avoid 2018 (highest recall year) and 2021 (early 3.5L EB issues). 2022+ most stable generation.'},
+'ram 1500':{good:[2020,2021,2022,2023,2009,2010,2011],bad:[2014,2013,2015,2016],notes:'Post-2020 improved electronics. 2014 worst year (22+ recalls). 2019+ refresh much better.'},
+'chevy silverado 1500':{good:[2021,2022,2023,2012],bad:[2014,2015,2016,2017,2018,2019,2020],notes:'AFM lifter failure on 5.3L is real $3K-6K risk 2014-2020. 2012 = J.D. Power 85/100. 2021+ DFM better.'},
+'toyota tundra':{good:[2022,2023,2024,2010,2011,2012,2013],bad:[2007,2008],notes:'2007-08 cam tower sludge issue — verify Toyota extended warranty documentation. 2022+ redesign excellent. 2010-2013 V8 highly reliable.'},
+'ford f-250 super duty':{good:[2017,2018,2019,2020,2021,2022,2023,2024],bad:[2003,2004,2005,2006,2007,2008,2009,2010],notes:'NEVER buy 6.0L (03-07) or 6.4L (08-10) without complete documented history. 6.7L (2011+) is excellent. 7.3L Godzilla (2020+) exceptional gas option.'},
+'nissan titan':{good:[2020,2021,2022],bad:[],notes:'More recent is better. Limited updates since 2016 redesign. No significant documented mechanical failures.'},
+'chevy silverado 2500hd':{good:[2020,2021,2022,2023,2024],bad:[2011,2012,2013,2014,2015,2016],notes:'L5P Duramax (2017+) is best Duramax generation. LML (2011-2016) had injector issues.'}
+};
+
+const GUIDE_SECTIONS=[
+{title:'1. Fuel type — Gas vs Diesel vs Hybrid vs EV',body:`
+<p>The fuel type decision is the single most impactful choice you will make — it shapes purchase price, long-term maintenance, resale value, and day-to-day usability.</p>
+<table class="data-table"><tr><th>Factor</th><th>Gas</th><th>Diesel</th><th>Hybrid</th><th>Full EV</th></tr>
+<tr><td><strong>Purchase premium</strong></td><td>$0 base</td><td>+$4K–$12K</td><td>+$3K–$7K</td><td>+$15K–$25K</td></tr>
+<tr><td><strong>Fuel economy (empty)</strong></td><td>14–20 MPG</td><td>18–24 MPG</td><td>20–26 MPG</td><td>~70–90 MPGe</td></tr>
+<tr><td><strong>Fuel economy (towing)</strong></td><td>8–13 MPG</td><td>10–18 MPG</td><td>10–16 MPG</td><td>50–60% range loss</td></tr>
+<tr><td><strong>Fuel cost/month*</strong></td><td>~$229/mo</td><td>~$198/mo</td><td>~$195/mo</td><td>~$80–$140/mo</td></tr>
+<tr><td><strong>Oil change cost</strong></td><td>$60–$120</td><td>$100–$200</td><td>$80–$140</td><td>$0–$30</td></tr>
+<tr><td><strong>Oil change interval</strong></td><td>5K–7.5K mi</td><td>7.5K–15K mi</td><td>5K–10K mi</td><td>~15K mi (minimal)</td></tr>
+<tr><td><strong>DEF fluid required</strong></td><td>No</td><td>Yes (~$25/fill)</td><td>No</td><td>No</td></tr>
+<tr><td><strong>DPF system issues</strong></td><td>None</td><td>Possible (city driving)</td><td>None</td><td>None</td></tr>
+<tr><td><strong>Transmission type</strong></td><td>Auto 6–10 speed</td><td>Auto 6–10 speed</td><td>eCVT or Auto</td><td>Single-speed</td></tr>
+<tr><td><strong>Engine longevity</strong></td><td>200K–300K mi</td><td>300K–500K mi</td><td>250K–400K mi</td><td>Motor 300K+; Battery 100–200K</td></tr>
+<tr><td><strong>Cold weather issues</strong></td><td>Minor</td><td>Minor (gelling &lt;-10F)</td><td>Minor</td><td>Severe (20–40% range loss)</td></tr>
+<tr><td><strong>Towing suitability</strong></td><td>Good–Very Good</td><td>Excellent</td><td>Good (1500 class)</td><td>Poor–Marginal</td></tr>
+<tr><td><strong>Heavy haul suitability</strong></td><td>Good</td><td>Best</td><td>Fair</td><td>Not recommended</td></tr>
+<tr><td><strong>5-yr resale value</strong></td><td>45–50%</td><td>60–70%</td><td>50–60%</td><td>30–45% (volatile)</td></tr>
+<tr><td><strong>Emissions complexity</strong></td><td>Low</td><td>High (DPF/EGR/DEF)</td><td>Low–Medium</td><td>None (tailpipe)</td></tr>
+<tr><td><strong>Charging infrastructure</strong></td><td>N/A</td><td>N/A</td><td>N/A</td><td>Required — major limitation</td></tr>
+<tr><td><strong>Best for</strong></td><td>Daily driver, light towing</td><td>Heavy/frequent towing, fleets</td><td>Balanced daily + occasional tow</td><td>Urban-only, short range, no heavy work</td></tr>
+</table>
+<p style="font-size:12px;color:var(--text-muted)">*Fuel cost based on 2025 national averages: Diesel $4.35/gal, Gas $3.89/gal, EV ~$0.13/kWh at 1,000 miles/month.</p>
+
+<p><strong>Diesel — The Honest Case</strong></p>
+<p>Diesel makes clear economic sense only when the use case justifies it. With a $9,000–$12,000 diesel premium and $1,500–$2,500 higher annual maintenance, a diesel buyer typically needs <strong>5–8 years of regular heavy towing</strong> to break even. Resale premium of $10,000–$15,000 for high-mileage diesels in strong demand markets can tilt the scale.</p>
+<p><strong>Diesel wins when:</strong> Towing over 15,000 lbs more than 40% of the time. 30,000+ miles/year. Planning to keep the truck 200,000+ miles.</p>
+<p><strong>Diesel loses when:</strong> City driving kills diesel — frequent short trips prevent DPF passive regeneration, leading to DPF replacement ($2,500–$4,000). Light towing or no towing. Planning to sell before 150,000 miles.</p>
+<div class="warn-box"><strong>The Idling Trap:</strong> Diesel engines are designed to work under load. Excessive idling causes soot buildup, DPF clogging, and EGR issues. A diesel used primarily as a daily commuter will cost more and last less than a gas equivalent.</div>
+
+<p><strong>Gas — The Honest Case</strong></p>
+<p>Gas engines have closed the capability gap significantly. The Ford 7.3L Godzilla V8 and Ram 6.4L HEMI are legitimate alternatives to diesel for moderate-duty work. Simpler emissions system — no DEF, no DPF, no EGR complexity. Lower purchase price, lower maintenance costs, easier to find competent mechanics. Adequate for towing under 12,000–15,000 lbs. For the F-150/1500 class, gas or hybrid makes sense for the vast majority of buyers.</p>
+
+<p><strong>Hybrid Trucks — The Balanced Option</strong></p>
+<p>The Toyota Tundra iForce MAX (437 HP) and Ford F-150 PowerBoost (430 HP, 2.0 kWh Pro Power Onboard) represent mature, well-engineered systems. These are not compliance vehicles. The PowerBoost's onboard power export is genuinely useful on job sites and campsites. <strong>Limitation:</strong> Hybrid 1500 trucks are NOT adequate substitutes for diesel 2500/3500 trucks in heavy sustained towing.</p>
+
+<p><strong>Full EV — Honest Assessment</strong></p>
+<p><strong>Works well:</strong> Urban daily driver under 150 miles/day. Fleet vehicles returning to depot for overnight charging. Second vehicle for someone who already owns a capable gas/diesel truck.</p>
+<p><strong>Does not work:</strong> Long-distance without planned charging. Remote work environments without charging. Cold climates — documented 20–40% range loss below 20°F. Heavy continuous towing — loaded trailer cuts EV range 50–60%, turning a 300-mile truck into a 120–150 mile truck.</p>
+<p><strong>Ford F-150 Lightning:</strong> Real-world max tow range drops to approximately 100–130 miles with a loaded trailer. Not a viable work truck for anyone who regularly hauls. <strong>Chevy Silverado EV / RAM 1500 REV:</strong> Better range specs but same physics — towing kills range.</p>
+<p><strong>Cost reality:</strong> EVs have very low fuel and maintenance costs but higher purchase prices, higher insurance, and a rapidly changing resale market. A 2023 F-150 Lightning has already lost 35–45% of its value — the EV used market is volatile.</p>
+<div class="warn-box"><strong>Charging infrastructure gap:</strong> Outside of metro areas, DC fast chargers capable of handling a truck with a trailer are still sparse. Being stranded 200 miles from nowhere with a dead truck is not acceptable for anyone using a truck as a primary work or travel vehicle.</div>
+
+<div class="info-box"><strong>Solid-state batteries (horizon only — no buying implication):</strong> Toyota confirmed production approval in Japan (October 2025), targeting first vehicle 2027, mass production 2029–2030. Claimed specs: 600–1,000+ mile range, 10-minute 10–80% charge. But the timeline has slipped from 2020 to 2023 to 2026 to now. A viable solid-state work truck is 8–12+ years out. <strong>Buying implication:</strong> If you are considering delaying a truck purchase to wait for solid-state EV trucks, the practical timeline does not support waiting. Buy the right diesel or hybrid for your needs now. Revisit in 2030–2032 for the EV truck market.</div>`},
+
+{title:'2. Truck classes — 1500 / 2500 / 3500',body:`
+<p>These three classes are fundamentally different vehicles that happen to share the word "truck." Comparing a 1500 to a 3500 is like comparing a minivan to a semi. Each class is evaluated on its own terms.</p>
+
+<p><strong>Class 1500 — Light Duty (Half-Ton)</strong></p>
+<table class="data-table"><tr><th>Model</th><th>Engine options</th><th>Max tow</th><th>IIHS 2025</th><th>Reliability</th></tr>
+<tr><td>Ford F-150</td><td>2.7L EB, 3.5L EB, 5.0L V8, 3.5L Hybrid</td><td>13,500 lbs</td><td>Poor mod overlap / TSP 2024</td><td>3.8/5 RepairPal</td></tr>
+<tr><td>Ram 1500</td><td>3.6L V6, 5.7L HEMI, Hurricane I-6, 3.0L EcoDiesel</td><td>12,750 lbs</td><td>Poor mod overlap</td><td>3.5/5 — #1 in class</td></tr>
+<tr><td>Chevy Silverado 1500</td><td>2.7L TB, 5.3L V8, 6.2L V8, 3.0L Duramax</td><td>13,300 lbs</td><td>Poor + weak headlights</td><td>3.5/5 — weak electronics</td></tr>
+<tr><td>GMC Sierra 1500</td><td>Same as Silverado + premium trims</td><td>13,300 lbs</td><td>Poor (same platform)</td><td>3.5/5 — same platform as Chevy</td></tr>
+<tr><td>Toyota Tundra</td><td>3.5L Twin-Turbo V6, iForce MAX Hybrid</td><td>12,000 lbs</td><td><strong>TSP+ 2025 — best in class</strong></td><td>4.0/5 — fewest issues</td></tr>
+<tr><td>Nissan Titan</td><td>5.6L V8 gas only</td><td>9,700 lbs</td><td>Not tested 2025</td><td>3.0/5 — stagnant since 2016</td></tr>
+</table>
+<p>Notes: RAM 1500 has best-in-class ride comfort — coil-spring rear suspension, air suspension option. No other full-size uses this setup. F-150 aluminum body (2015+) saves weight but raises repair costs after body damage.</p>
+
+<p><strong>Class 2500 — Heavy Duty (Three-Quarter Ton)</strong></p>
+<p>Serious trucks for serious work. Over 60% of 2500-class trucks are sold with diesel engines.</p>
+<table class="data-table"><tr><th>Model</th><th>Engine options</th><th>Max tow</th><th>Best use case</th><th>Reliability note</th></tr>
+<tr><td>Ford F-250 Super Duty</td><td>6.8L V8, 7.3L Godzilla V8, 6.7L Powerstroke</td><td>22,800 lbs diesel</td><td>Serious towing, work truck</td><td>6.7L solid; AVOID 6.0/6.4 used</td></tr>
+<tr><td>Ram 2500</td><td>6.4L HEMI, 6.7L Cummins</td><td>23,130 lbs diesel</td><td>Heavy towing, farm/ranch</td><td>Cummins highly reliable</td></tr>
+<tr><td>Chevy Silverado 2500HD</td><td>6.6L V8, 6.6L Duramax</td><td>22,100 lbs diesel</td><td>Work fleets, heavy haul</td><td>L5P Duramax excellent</td></tr>
+<tr><td>GMC Sierra 2500HD</td><td>Same as Silverado 2500HD</td><td>22,100 lbs diesel</td><td>Premium trim + HD capability</td><td>Same platform as Chevy</td></tr>
+</table>
+<p><strong>The Cummins advantage (Ram 2500):</strong> The 6.7L Cummins at 1,075 lb-ft (High Output) is widely regarded as the most reliable heavy-duty diesel in a production pickup. Real-world owners regularly report 300,000–400,000+ miles with proper maintenance. This is the benchmark engine for sustained heavy towing.</p>
+<p><strong>Gas in the 2500 class:</strong> The Ford 7.3L Godzilla V8 and Chevy 6.6L V8 are genuinely capable for operators who do not need maximum tow ratings. Simpler, cheaper to maintain, no DEF. Good choice for under-15,000 lb towing.</p>
+
+<p><strong>Class 3500 — Maximum Duty (One-Ton)</strong></p>
+<p>Commercial-territory equipment. Over 70% of 3500s are sold diesel. Only buy if you genuinely need 20,000+ lb capacity.</p>
+<table class="data-table"><tr><th>Model</th><th>Max tow 5th-wheel</th><th>Configuration notes</th><th>Reliability note</th></tr>
+<tr><td>Ford F-350 Super Duty (DRW diesel)</td><td>43,000 lbs</td><td>SRW and DRW; commercial use; real-world safe sustained: 30,000–36,000 lbs</td><td>6.7L 2011+ is excellent</td></tr>
+<tr><td>Ram 3500 HO Cummins DRW</td><td>35,100+ lbs</td><td>Best diesel torque in class</td><td>1,075 lb-ft — Cummins legendary</td></tr>
+<tr><td>Chevy/GMC 3500HD Duramax DRW</td><td>36,000 lbs</td><td>Fleet and agriculture standard</td><td>L5P Duramax HO very capable</td></tr>
+</table>
+<p><strong>DRW vs SRW:</strong> Dual rear wheel (DRW) provides dramatically higher payload and towing stability for 5th-wheel and gooseneck. Single rear wheel (SRW) is more maneuverable in town. If towing near maximum ratings, DRW is the correct choice.</p>
+<div class="warn-box">Hybrid/EV in the 3500 class does not exist in any meaningful, capable form. Do not consider EV for this class.</div>`},
+
+{title:'3. Real-world ownership costs',body:`
+<table class="data-table"><tr><th>Maintenance item</th><th>Gas 1500</th><th>Diesel 1500</th><th>Gas HD</th><th>Diesel HD</th><th>Notes</th></tr>
+<tr><td>Oil change / interval</td><td>$60–$120</td><td>$100–$200</td><td>$80–$130</td><td>$120–$250</td><td>Diesel uses more oil, higher-spec fluid</td></tr>
+<tr><td>Oil change interval</td><td>5K–7.5K mi</td><td>7.5K–15K mi</td><td>5K–7.5K mi</td><td>7.5K–10K mi</td><td>Use Blackstone oil analysis ($35/sample) for diesels</td></tr>
+<tr><td>Fuel filter</td><td>$20–$50/yr</td><td>$50–$150/yr</td><td>$20–$50/yr</td><td>$50–$150/yr</td><td>Diesel requires more frequent replacement</td></tr>
+<tr><td>DEF fluid (diesel only)</td><td>N/A</td><td>$25–$50/refill</td><td>N/A</td><td>$25–$50/refill</td><td>~Every 10K miles; never let it run dry</td></tr>
+<tr><td>DPF cleaning/regen</td><td>N/A</td><td>$0–$1,500+ (city)</td><td>N/A</td><td>$0–$4,000+ (city)</td><td>City driving shortens DPF life dramatically</td></tr>
+<tr><td>Transmission service</td><td>$150–$300</td><td>$150–$350</td><td>$200–$400</td><td>$200–$450</td><td>More critical under towing; extend interval with cooler</td></tr>
+<tr><td>Spark plugs (gas only)</td><td>$80–$200 / 60K</td><td>N/A</td><td>$100–$250</td><td>N/A</td><td>Diesel has no spark plugs — advantage</td></tr>
+<tr><td>Serpentine belt</td><td>$80–$200</td><td>$100–$250</td><td>$100–$250</td><td>$120–$300</td><td>Replace on schedule — not when it breaks</td></tr>
+<tr><td>Coolant flush</td><td>$100–$200 / 5yr</td><td>$100–$200 / 5yr</td><td>$150–$250</td><td>$150–$300</td><td>Critical for diesels — prevents EGR/cooler failure</td></tr>
+<tr><td>Brake pads + rotors</td><td>$300–$600/axle</td><td>$300–$600/axle</td><td>$400–$700/axle</td><td>$400–$800/axle</td><td>Diesel exhaust brake reduces front pad wear significantly</td></tr>
+<tr><td>Battery replacement</td><td>$150–$300 (1)</td><td>$200–$500 (dual)</td><td>$200–$350</td><td>$300–$600 (dual)</td><td>Replace both dual batteries at same time</td></tr>
+<tr><td><strong>Annual total avg</strong></td><td><strong>$800–$1,400</strong></td><td><strong>$1,800–$3,200</strong></td><td><strong>$1,000–$1,800</strong></td><td><strong>$2,000–$4,000</strong></td><td>Diesel costs more annually; recouped in longevity/resale</td></tr>
+</table>
+<p><strong>Key maintenance notes:</strong></p>
+<p><strong>Oil analysis — use it:</strong> For any diesel or high-mileage gas truck, $35 oil analysis from Blackstone Laboratories every 7,500 miles is the best diagnostic money you can spend. Catches EGR dilution, coolant intrusion, and bearing wear before catastrophic failure.</p>
+<p><strong>Diesel fluid discipline:</strong> Never let DEF run dry — it can damage the SCR catalyst. Never mix DEF with diesel. Use only certified DEF. A $25 fill every 10,000 miles is cheap insurance.</p>
+<p><strong>Transmission cooler — not optional for towers:</strong> Single best protective investment for any truck used for towing. Prevents the $3,000–$8,000 transmission failure that comes from heat buildup. Cost: $150–$400 installed.</p>
+<p><strong>Serpentine belt:</strong> Replace on schedule (every 60,000–100,000 miles), not when it breaks. If it breaks while driving, you lose power steering, AC, and potentially the alternator and cooling fan — tow bill plus parts plus labor.</p>
+<p><strong>Battery:</strong> Test annually if over 3 years old. Diesel trucks run dual batteries — replace both at the same time.</p>
+
+<p><strong>Insurance costs:</strong> Average full coverage new 2025 truck: $1,800–$2,800/year. GM trucks: 15–25% higher premiums due to documented theft vulnerability. Toyota Tundra: generally lower rates. Diesel trucks: higher comprehensive due to specialized repair costs. High-value trims (Platinum, Denali): significantly higher premiums. Anti-theft discounts: 5–15% with documentation — ask your insurer for their specific qualifying device list before purchasing.</p>
+
+<p><strong>Financing — real math:</strong> Current rates (mid-2026): New truck loans 6–9% for good credit. Used truck loans 7–12%. OEM incentive rates 0–2.9% when available.</p>
+<div class="warn-box"><strong>The 84-month loan trap:</strong> 84-month (7-year) loans are dangerous — you will owe more than the truck is worth for 3–4 of those 7 years. Target 48–60 months. A $55,000 truck at 7% for 72 months costs ~$12,000 in interest. At 48 months: ~$8,200. Nearly $4,000 saved. Down payment of 10–20% reduces underwater risk and total interest. On a $55K truck, $8K–$11K down is financially sound.</div>`},
+
+{title:'4. Safety ratings — IIHS, NHTSA, and what they mean',body:`
+<table class="data-table"><tr><th>Model</th><th>NHTSA</th><th>IIHS Mod Overlap</th><th>IIHS Headlights</th><th>TSP+ 2025</th><th>Key notes</th></tr>
+<tr><td>Toyota Tundra</td><td>5 Stars</td><td>GOOD</td><td>Acceptable</td><td><strong>Yes — only full-size</strong></td><td>Best rear passenger protection; only TSP+ in class</td></tr>
+<tr><td>Ford F-150</td><td>5 Stars</td><td>POOR (rear pax)</td><td>Good LED</td><td>TSP 2024 only</td><td>Good front; rear passenger risk documented</td></tr>
+<tr><td>Ram 1500</td><td>5 Stars</td><td>POOR (rear pax)</td><td>Good LED</td><td>No TSP 2025</td><td>Leads Big 3 in crash prevention systems</td></tr>
+<tr><td>Chevy Silverado 1500</td><td>4–5 Stars</td><td>POOR + Marginal</td><td>POOR halogens</td><td>No TSP (years)</td><td>Worst of Big 3 in IIHS; weakest headlights</td></tr>
+<tr><td>GMC Sierra 1500</td><td>4–5 Stars</td><td>POOR + Marginal</td><td>POOR lower trims</td><td>No TSP (years)</td><td>Same platform as Silverado — same concerns</td></tr>
+<tr><td>Ford F-250/350</td><td>Not rated HD</td><td>Limited testing</td><td>Varies by trim</td><td>N/A</td><td>HD class not in standard IIHS pool</td></tr>
+<tr><td>Ram 2500/3500</td><td>Not rated HD</td><td>Limited testing</td><td>Varies by trim</td><td>N/A</td><td>HD class exempt from standard IIHS cycle</td></tr>
+</table>
+<p>The IIHS Poor ratings for rear passenger in the moderate overlap test are NOT minor. They indicate meaningfully higher injury risk to rear-seat occupants — a serious concern for family haulers. The Toyota Tundra and Tesla Cybertruck are the only full-size trucks that protect rear passengers well in this test as of 2025.</p>
+<p>NHTSA 5-star ratings are useful but IIHS tests are generally the tougher, more relevant standard for real-world crashes. Prioritize IIHS when in doubt. HD trucks (2500/3500) are not included in standard IIHS ratings cycle — rely on real-world accident data and owner forum reports.</p>`},
+
+{title:'5. Known issues per model — what mechanics won\'t volunteer',body:`
+<p><strong>Ford — diesel engines: avoid these in used trucks</strong></p>
+<p><strong>6.0L Powerstroke (2003–2007):</strong> EGR cooler failure, head gasket issues, FICM (fuel injection control module) failure, oil cooler plugging. Can be "bulletproofed" with aftermarket EGR and oil cooler upgrades — budget $3,000–$6,000 for preventive work. Many mechanics love these engines because they generate steady revenue. Major repairs: $10,000–$16,000.</p>
+<p><strong>6.4L Powerstroke (2008–2010):</strong> DPF issues, radiator failures, piston cracking, fuel dilution of oil. Ford forum consensus: "150K +/- 50K mile engine." Ford itself scrapped the Navistar partnership over this engine. Budget for potential $10,000–$16,000 in major repairs. Walk away without complete documented history.</p>
+<p><strong>6.7L Powerstroke (2011+):</strong> Excellent engine. EGR cooler is a maintenance item ($800–1,500) — not a failure mode when addressed preventively. This is the one to buy.</p>
+<p><strong>7.3L Godzilla V8 (2020+):</strong> Exceptional gas alternative. Simple, durable, 430 HP, no emissions complexity. No significant documented known issues.</p>
+
+<p><strong>GM trucks</strong></p>
+<p><strong>5.3L AFM lifter failures (2014–2021):</strong> Active Fuel Management lifter failures cost $3,000–$6,000 to repair. This is the defining known issue for this generation. The 6.2L does not have this problem — it is the preferred engine choice.</p>
+<p><strong>10-speed automatic (gas, 2020+):</strong> Documented shuddering, hard shifting, and hesitation complaints from forums and Consumer Reports. Ongoing issue as of mid-2026.</p>
+<p><strong>Electronics (2022–2026):</strong> Recurring infotainment glitches and instrument cluster failures. Consumer Reports repeatedly cites GM electronics as the weakest area. Buy with current warranty coverage.</p>
+<p><strong>LML Duramax (2011–2016):</strong> Injector failures at higher mileage. L5P (2017+) addressed these.</p>
+<p><strong>GM keyless entry vulnerability:</strong> Class action alleges GM knowingly failed to implement adequate anti-theft protections. OBD port vulnerability enabling key fob cloning not fully resolved across all models. An OBD port lock is mandatory for any GM truck.</p>
+
+<p><strong>Ram</strong></p>
+<p><strong>ZF 8-speed transmission (2013–2018):</strong> Documented shuddering and hunting issues. Updated programming resolved this — 2019+ is largely resolved.</p>
+<p><strong>Rear window/glass leaks (2019–2022):</strong> Recurring reports of rear windshield and third-brake-light water intrusion. If moisture reaches headliner or electronics, repairs escalate.</p>
+<p><strong>Instrument cluster (2025–2026):</strong> Active recall for display blanking. Not catastrophic but frustrating. Warranty covers it.</p>
+<p><strong>Ram electronics (general):</strong> Infotainment glitches are common complaints. Typically software-related; warranty repairs usually successful.</p>
+
+<p><strong>Toyota Tundra</strong></p>
+<p><strong>2007–2008 cam tower sludge:</strong> Toyota issued extended warranty coverage. Verify documentation on any 2007–2008 in the used market.</p>
+<p><strong>2022+ new generation:</strong> Excellent early data. The turbo V6 replacing the V8 was initially controversial but has proven reliable. iForce MAX hybrid system has had no significant documented failures at scale as of mid-2026. Cleanest known issues record of any full-size truck.</p>
+<p><strong>Parts cost note:</strong> Toyota parts are generally more expensive than domestic brands. Labor is typically lower because there is less to fix.</p>`},
+
+{title:'6. Theft risk and proven deterrents',body:`
+<table class="data-table"><tr><th>Model</th><th>Risk level</th><th>HLDI rate vs avg</th><th>Primary method</th><th>Risk factor</th></tr>
+<tr><td>GMC Sierra 2500/3500 HD</td><td><strong>EXTREME</strong></td><td>1,023× average</td><td>OBD port fob cloning</td><td>Highest-rated pickup theft in nation</td></tr>
+<tr><td>Chevy Silverado (all)</td><td><strong>VERY HIGH</strong></td><td>~8–10× average</td><td>Key fob relay + OBD clone</td><td>21,666 stolen in 2024; class action vs GM</td></tr>
+<tr><td>Ford F-Series (all)</td><td><strong>HIGH</strong></td><td>~5–7× average</td><td>Relay attack, OBD clone</td><td>Historically top 3 most stolen</td></tr>
+<tr><td>Ram 1500/2500/3500</td><td><strong>MODERATE–HIGH</strong></td><td>~3–5× average</td><td>Relay attack</td><td>Lower than GM trucks; improving</td></tr>
+<tr><td>Toyota Tundra</td><td><strong>MODERATE</strong></td><td>~1.5–2.5× average</td><td>Standard break-in</td><td>Better than US Big 3; improving security</td></tr>
+<tr><td>Nissan Titan</td><td><strong>LOW–MODERATE</strong></td><td>~1–2× average</td><td>Standard methods</td><td>Lowest risk among mainstream trucks</td></tr>
+</table>
+<p><strong>NICB vs HLDI:</strong> NICB (National Insurance Crime Bureau) tracks absolute theft counts — high-volume trucks appear near the top simply because millions are on the road. HLDI (Highway Loss Data Institute) tracks theft claims per 1,000 insured vehicle-years — the more meaningful metric. GMC Sierra HD and Chevy Silverado HD have genuinely alarming HLDI rates, not just high counts.</p>
+<p><strong>Two dominant theft methods in 2025:</strong> (1) Relay attack — thieves amplify your key fob signal from inside your home, unlock the truck, and drive away in under 3 minutes. No broken glass. (2) OBD port hack — plug into the OBD-II port under the dash, program a blank fob in 90 seconds. Both methods bypass traditional alarms entirely.</p>
+<table class="data-table"><tr><th>Deterrent</th><th>Cost</th><th>Effectiveness</th><th>Insurance discount</th><th>Notes</th></tr>
+<tr><td>Faraday pouch (key fob)</td><td>$10–$25</td><td>EXCELLENT vs relay attacks</td><td>Ask insurer</td><td>Stops relay attack; store keys at home in pouch — cheap, essential</td></tr>
+<tr><td>OBD port lock</td><td>$20–$50</td><td>EXCELLENT vs OBD clone</td><td>Ask insurer</td><td>Physical block; stops #2 truck theft method; mandatory for GM</td></tr>
+<tr><td>Steering wheel lock (Club)</td><td>$30–$80</td><td>GOOD visual deterrent</td><td>5–10% possible</td><td>Thieves skip to easier targets; The Club 3000 is well-regarded</td></tr>
+<tr><td>Hidden kill switch</td><td>$50–$200 installed</td><td>EXCELLENT — truck won't run</td><td>10–15% possible</td><td>Disables fuel pump or starter; thief clones key but truck won't start</td></tr>
+<tr><td>GPS tracker LTE</td><td>$50–$150 + ~$15/mo</td><td>EXCELLENT for recovery</td><td>10–15% possible</td><td>Bouncie, LandAirSea 54 well-reviewed; keep activation documentation</td></tr>
+<tr><td>Aftermarket alarm</td><td>$150–$400 installed</td><td>GOOD audible deterrent</td><td>5–15%</td><td>Compustar preferred brand; professional install recommended</td></tr>
+<tr><td>VIN etching</td><td>$100–$200 or DIY</td><td>FAIR resale deterrent</td><td>5% some insurers</td><td>Makes chop-shopping harder; some dealers include free</td></tr>
+<tr><td><strong>Recommended system</strong></td><td><strong>$200–$500 total</strong></td><td><strong>95% coverage</strong></td><td><strong>Up to 20% combined</strong></td><td><strong>Faraday + OBD lock + kill switch + GPS</strong></td></tr>
+</table>
+<p>Insurance documentation: Most insurers require proof of installation (receipt, serial number, sometimes a photo). Active systems typically qualify for larger discounts than passive ones. GPS trackers with verified uptime records often unlock the highest discount tier. California, New York, and some states have laws on alarm decibel limits — check local ordinances.</p>
+<div class="warn-box"><strong>GM trucks specifically:</strong> The OBD port vulnerability is widely known in the theft community. A $30–$50 OBD port lock is the highest ROI deterrent investment for Silverado and Sierra owners.</div>`},
+
+{title:'7. New vs used — best and worst years',body:`
+<table class="data-table"><tr><th>Factor</th><th>Buying new</th><th>Buying used</th></tr>
+<tr><td>Purchase price</td><td>$40K–$85K+</td><td>$20K–$55K (3–5 yr old)</td></tr>
+<tr><td>Depreciation hit</td><td>You absorb year 1 (~15–20% loss)</td><td>Prior owner absorbed it</td></tr>
+<tr><td>Warranty</td><td>Full factory (3/36K; 5/60K powertrain)</td><td>Limited/expired; extended options vary</td></tr>
+<tr><td>Known history</td><td>Clean slate</td><td>Must verify; Carfax/service records essential</td></tr>
+<tr><td>Financing rate</td><td>Often 0–2.9% OEM incentives</td><td>7–12%; higher total interest</td></tr>
+<tr><td>Latest tech/safety</td><td>Yes — newest ADAS, connectivity</td><td>May lack modern safety features</td></tr>
+<tr><td>Best value brands used</td><td>—</td><td>Toyota &gt; Ram &gt; Ford &gt; GM generally</td></tr>
+<tr><td>Brands better new only</td><td>GM trucks: buy new for warranty coverage</td><td>Risky used without knowing history</td></tr>
+<tr><td>Sweet spot (used)</td><td>—</td><td>2–3 yrs old, under 60K miles</td></tr>
+<tr><td>Verdict</td><td>Best if: long-term owner, specific config needed, OEM incentives strong</td><td>Best if: budget-conscious, avoid first-year model year, proven year</td></tr>
+</table>
+
+<p><strong>Best and worst years by model</strong></p>
+<table class="data-table"><tr><th>Model</th><th>Best used years</th><th>Avoid</th><th>Why</th></tr>
+<tr><td>Ford F-150</td><td>2021–2023</td><td>2018, 2004–2006</td><td>2018 highest recall year; 2021+ most stable gen</td></tr>
+<tr><td>Ford F-250/350 (diesel)</td><td>2011–2019, 2021+</td><td>2003–2010</td><td>6.0/6.4 Powerstroke documented disasters; 6.7L solid</td></tr>
+<tr><td>Ford F-250/350 (gas)</td><td>2017+, 2020+ 7.3L Godzilla</td><td>2005–2012</td><td>7.3L Godzilla (2020+) is strong, simple, reliable</td></tr>
+<tr><td>Ram 1500</td><td>2020–2023, 2009–2011</td><td>2014, 2013–2016</td><td>2014 worst year (22+ NHTSA complaints); 2020+ improved</td></tr>
+<tr><td>Ram 2500/3500 Cummins</td><td>2019+, 2013–2018</td><td>Watch 2010–2012</td><td>Cummins reliable; watch injectors 2010–2012</td></tr>
+<tr><td>Chevy Silverado 1500</td><td>2021–2023, 2012</td><td>2014–2015, 2016–2020</td><td>2012 = J.D. Power 85/100; 2014–15 = 23+ recalls; AFM risk 2014–2020</td></tr>
+<tr><td>Chevy Silverado 2500HD</td><td>2020+ L5P Duramax</td><td>2011–2016 LML</td><td>L5P (2017+) best Duramax generation; LML injector issues</td></tr>
+<tr><td>Toyota Tundra</td><td>2022+ new gen, 2010–2013</td><td>2007–2008</td><td>2022 redesign excellent; 2007–08 cam tower sludge</td></tr>
+<tr><td>GMC Sierra 1500</td><td>2021–2023</td><td>Same as Silverado platform</td><td>Same platform — treat same as Chevy equivalent</td></tr>
+</table>
+
+<p><strong>Brands better new vs those that hold up used:</strong> Toyota holds up better used than any other truck brand — higher-mileage examples remain desirable and reliable. RAM can be excellent used if you know the right years — Cummins diesel especially holds value. Ford generally reliable used with the right model year — F-250/350 requires knowing the diesel year (6.0/6.4 prohibition is absolute). GM higher risk used due to electronics complexity and unresolved theft vulnerability — often priced lower for a reason. If used GM is the choice, stay within the warranty period of the original purchase if possible.</p>
+
+<div class="warn-box"><strong>Rust belt reality:</strong> If a truck was used in states that salt roads (MN, MI, OH, NY, PA, WI), inspect the frame, undercarriage, and suspension mounts for rust before anything else. Frame rot means the truck is scrap regardless of engine condition. Southwest-region trucks are almost always rust-free.</div>
+<p><strong>Service records:</strong> For a diesel especially, service records are non-negotiable. An unverified diesel with unknown maintenance history is a lottery ticket, not a purchase.</p>
+<p><strong>Deleted diesels:</strong> Illegal to operate on public roads in most states. Fails emissions testing where required. Smaller resale pool. Walk away unless you fully understand what you are buying.</p>
+<p><strong>Carfax limitations:</strong> Carfax only shows reported accidents. Cash-paid body shop repairs do not appear. Always get an independent pre-purchase inspection for any used truck over $20,000. Budget $150–$200 — cheap compared to what it can save you.</p>
+<p><strong>CPO programs:</strong> Ford, Ram, and Toyota CPO programs are among the better ones. GM's is adequate. Worth the modest premium over non-CPO used.</p>`},
+
+{title:'8. Lease vs buy — honest financial analysis',body:`
+<table class="data-table"><tr><th>Factor</th><th>Leasing</th><th>Buying (finance or cash)</th></tr>
+<tr><td>Monthly payment</td><td>Lower ($400–$700 typical)</td><td>Higher ($700–$1,200 typical)</td></tr>
+<tr><td>Down payment</td><td>Low ($0–$3K)</td><td>Moderate–High ($3K–$10K+)</td></tr>
+<tr><td>Mileage limits</td><td>10K–15K/yr; excess ~$0.15–$0.25/mile</td><td>Unlimited — no penalty</td></tr>
+<tr><td>Work/towing use</td><td>Wear and tear fees = very expensive</td><td>No restrictions — truck is yours</td></tr>
+<tr><td>Modifications</td><td>Not permitted without penalty</td><td>Unrestricted</td></tr>
+<tr><td>Equity built</td><td>Zero — you own nothing at term end</td><td>Yes — resale or trade-in value retained</td></tr>
+<tr><td>End of term options</td><td>Return, re-lease, or buy at residual (often overpriced)</td><td>Keep, sell, or trade-in</td></tr>
+<tr><td>Insurance cost</td><td>Usually higher — lender requires lower deductibles</td><td>Lower — you choose coverage levels</td></tr>
+<tr><td>Tax (business use)</td><td>Often 100% deductible</td><td>Depreciation deductible; varies</td></tr>
+<tr><td>5-year total cost</td><td>Higher overall (continuous payments, no equity)</td><td>Lower overall if kept post-payoff</td></tr>
+<tr><td><strong>Best Scenario</strong></td><td>Drive &lt;12K mi/yr, want new truck every 3 yrs, low upfront cash</td><td>Drive &gt;15K mi/yr, keep 6+ yrs, work truck use, want equity</td></tr>
+<tr><td><strong>Verdict</strong></td><td><strong>Rarely right for work trucks</strong></td><td><strong>Almost always better long-term</strong></td></tr>
+</table>
+<p><strong>When leasing might make sense:</strong> Under 12,000 miles/year. Want a new vehicle every 2–3 years. Business use with full payment deduction. Light-duty daily driving only. Documented need to always be in new warranty (medical equipment transport, specialized tech requirements).</p>
+<p><strong>When buying is the right answer:</strong> You plan to tow, haul, or use for actual work. More than 15,000 miles/year. Planning to keep 6+ years — math strongly favors buying once the loan is paid off. Want to modify or customize. Want flexibility to sell, trade, or use as equity.</p>
+<div class="info-box">The 30% leasing statistic for trucks is heavily skewed by business buyers and luxury-trim purchasers who have tax or cash-flow reasons. For the average family truck owner, buying remains the financially sound default. Leasing is a continuous payment that never ends unless you stop leasing — buying leads to a period of no payments once the loan is paid.</div>`},
+
+{title:'9. Towing and payload — what the numbers actually mean',body:`
+<p>Truck manufacturers publish maximum tow ratings under ideal conditions: specific cab/bed configuration, specific engine, specific axle ratio, no passengers, no cargo, at sea level, often with a weight distribution hitch. Real-world towing is different.</p>
+<div class="info-box"><strong>Real-world rule:</strong> Operate at 70–80% of rated capacity for comfortable, safe sustained towing. A truck rated at 13,500 lbs is a good fit for regular loads of 9,000–11,000 lbs.</div>
+<p><strong>Payload vs towing — these are different numbers:</strong> PAYLOAD is what goes in the bed. TOWING is what you pull. A truck rated at 13,500 lbs towing may have only 1,800 lbs of payload — meaning you, passengers, gear, and tongue weight of the trailer all count against that 1,800 lbs. Always check the actual door sticker, not marketing materials.</p>
+<p><strong>Tongue weight:</strong> For a hitch, tongue weight (downward force on the hitch) should be 10–15% of total trailer weight. For 5th-wheel and gooseneck, pin weight (typically 20–25% of trailer weight) transfers to the truck bed — critical for payload calculation.</p>
+<p><strong>Fuel economy under load:</strong> Expect 40–50% reduction in MPG when towing near capacity. A gas 1500 getting 18 MPG empty might get 9–11 MPG pulling a loaded 10,000 lb trailer.</p>
+<table class="data-table"><tr><th>Load range</th><th>Minimum class needed</th><th>Examples</th></tr>
+<tr><td>Up to 8,500 lbs</td><td>Any 1500 with tow package</td><td>Most boats, utility trailers, smaller campers</td></tr>
+<tr><td>8,500–14,000 lbs</td><td>Upper 1500 or entry 2500</td><td>Larger travel trailers, horse trailers, medium equipment</td></tr>
+<tr><td>14,000–20,000 lbs</td><td>2500-class minimum; diesel strongly recommended</td><td>5th-wheel RVs, livestock trailers, heavier equipment</td></tr>
+<tr><td>Over 20,000 lbs</td><td>3500-class only, diesel, DRW for stability</td><td>Commercial trailers, heavy 5th-wheels, gooseneck</td></tr>
+</table>
+<div class="warn-box"><strong>At the edge of a class's max capability — move up a class.</strong> Running at 100% of rated capacity regularly accelerates wear on engine, transmission, brakes, and suspension. The next class up pays for itself in longevity.</div>`},
+
+{title:'10. Aftermarket upgrades — proven value',body:`
+<table class="data-table"><tr><th>Upgrade</th><th>Cost range</th><th>Benefit</th><th>Real-world ROI</th><th>Notes</th></tr>
+<tr><td>Transmission cooler</td><td>$150–$400 installed</td><td>Transmission longevity</td><td>VERY HIGH if towing</td><td>Single best protection for auto trans under tow load; prevents $3K–$8K failure</td></tr>
+<tr><td>Air bag helper springs (Firestone/Air Lift)</td><td>$300–$700 + install</td><td>Towing stability, ride quality</td><td>HIGH for regular towers</td><td>Keeps truck level; reduces brake and suspension wear; adjustable pressure from cab optional</td></tr>
+<tr><td>Diesel fuel filtration (FASS/AirDog)</td><td>$400–$800 installed</td><td>Fuel system protection</td><td>HIGH — prevents $3K+ injector failures</td><td>Removes water/air from fuel; extends injector life dramatically</td></tr>
+<tr><td>Spray-in bed liner (LINE-X/Rhino)</td><td>$500–$700</td><td>Bed protection, resale value</td><td>MEDIUM-HIGH</td><td>Prevents rust, dings, oxidation; drop-in liners are inferior</td></tr>
+<tr><td>Tonneau cover (hard folding)</td><td>$600–$1,200</td><td>Security, fuel economy</td><td>MEDIUM — ~5–10% MPG</td><td>Hard covers deter theft better than soft; improves aerodynamics</td></tr>
+<tr><td>Exhaust brake (diesel)</td><td>$400–$900</td><td>Brake wear reduction, safety</td><td>HIGH for mountain/heavy towing</td><td>Saves front pads/rotors ~$800/interval on grades under load</td></tr>
+<tr><td>Cold air intake</td><td>$200–$400</td><td>Minor HP/fuel economy</td><td>LOW–MEDIUM</td><td>Small gain (~5–10 HP); more useful paired with tune; don't expect dramatic results alone</td></tr>
+<tr><td>Performance tune (ECU reflash)</td><td>$500–$1,500 pro</td><td>Power, towing efficiency</td><td>MEDIUM — best for diesel towing</td><td>Meaningful gains on diesel; gas gains modest; avoid cheap/aggressive tunes</td></tr>
+<tr><td>Heavy-duty hitch (Class IV/V)</td><td>$200–$600 installed</td><td>Towing safety/capacity</td><td>HIGH if towing over 10K lbs</td><td>Factory hitches often undersized; Class V receiver for 5th-wheel/gooseneck</td></tr>
+<tr><td>5th-wheel/gooseneck hitch</td><td>$600–$1,500 installed</td><td>Towing capacity, stability</td><td>HIGH for trailer owners</td><td>Distributes tongue weight through bed floor; more stable than ball hitch</td></tr>
+<tr><td>Dash camera (front + rear)</td><td>$150–$400</td><td>Insurance, liability protection</td><td>HIGH — evidence in accidents</td><td>Some insurers discount; front+rear covers all liability scenarios</td></tr>
+<tr><td>Upgraded shocks (Bilstein 5100)</td><td>$500–$900 installed</td><td>Ride quality, handling</td><td>MEDIUM-HIGH</td><td>Night and day improvement on lifted trucks or heavy off-road use</td></tr>
+</table>
+<p><strong>Upgrades to avoid:</strong> Excessive lift kits (4+ inches) — raises rollover risk, stresses CV axles, voids many factory warranties. Oversized tires without re-gearing — stresses drivetrain, reduces fuel economy. Cheap LED light bars — electrical issues, interfere with sensors, often not DOT-approved. Aggressive ECU tunes from unknown sources — can destroy injectors, burn pistons, void warranties. Only use established tuners with a track record for your specific engine.</p>`},
+
+{title:'11. Trim level economics',body:`
+<table class="data-table"><tr><th>Trim level</th><th>Typical price</th><th>Value score</th><th>Resale strength</th><th>Recommendation</th></tr>
+<tr><td>Base (Regular/Work)</td><td>$35K–$45K</td><td>LOW for most buyers</td><td>GOOD % but low dollar</td><td>Skip unless commercial fleet — uncomfortable for daily use</td></tr>
+<tr><td>Mid (XLT/LT/Big Horn/SR5)</td><td>$42K–$55K</td><td><strong>BEST VALUE</strong></td><td>GOOD — sweet spot</td><td>Best overall value; most features buyers actually want; best resale $/value ratio</td></tr>
+<tr><td>Upper-Mid (Lariat/LTZ/Laramie/TRD Pro)</td><td>$55K–$68K</td><td>GOOD</td><td>VERY GOOD</td><td>Where capability and comfort peak without luxury tax; recommended for serious use</td></tr>
+<tr><td>Near-Luxury (King Ranch/High Country/Limited)</td><td>$65K–$80K</td><td>FAIR — diminishing return</td><td>GOOD</td><td>Premium materials; features rarely justify cost over upper-mid</td></tr>
+<tr><td>Full-Luxury (Platinum/Denali/Longhorn/Capstone)</td><td>$75K–$95K+</td><td>POOR value</td><td>FAIR — depreciates faster</td><td>You are paying for status as much as function</td></tr>
+</table>
+<p><strong>Dealer networks:</strong> Ford has the largest dealer network in the US — highest probability of a dealer within reasonable distance anywhere. RAM (Stellantis): solid network, though Stellantis corporate turmoil of 2024–2025 created some dealer uncertainty. Cummins diesels can be serviced by independent diesel shops — reducing dealer dependency. GM: very large network but electronics warranty work requires dealer software — more dealer-dependent than other brands. Toyota: smaller network than Big 3 but excellent dealer consistency. In rural areas, the nearest Toyota dealer may be farther away — factor this in.</p>
+<p><strong>Independent diesel mechanics:</strong> Cummins and Powerstroke diesel owners have a significant advantage — independent diesel shops are everywhere and generally competent. Less true for GM Duramax, which has more proprietary electronics. This is a real-world reliability factor that does not show in ratings.</p>
+<p><strong>Extended warranties:</strong> Manufacturer extended warranties are generally the best coverage at a reasonable price. Ford ESP, Ram MaxCare, Toyota Gold Plus — all negotiable at time of sale (ask for invoice price). RAM has extended powertrain to 10 years/100,000 miles as standard (2025+) — excellent coverage that reduces third-party warranty value. Third-party warranties: read every exclusion clause before signing. When NOT to buy: a well-maintained diesel 2500/3500 with Cummins or 6.7L Powerstroke is unlikely to need powertrain warranty work within a reasonable term.</p>`},
+
+{title:'12. Trade-in timing — when to sell and how',body:`
+<table class="data-table"><tr><th>Scenario</th><th>Best exit window</th><th>Why</th></tr>
+<tr><td>Lease</td><td>1–3 months before lease end</td><td>Excess mileage and wear fees accumulate; dealers may offer early termination incentives</td></tr>
+<tr><td>Financed — general</td><td>Year 3–5, pre-major service</td><td>Depreciation curve flattens; truck still under some warranty</td></tr>
+<tr><td>Pre-major work needed</td><td>Before the repair if repair &gt; ~25% of truck value</td><td>Cost of repair does not return in resale; cut losses early</td></tr>
+<tr><td>Market peak</td><td>Late spring / early summer</td><td>Truck demand highest; higher trade-in values documented</td></tr>
+<tr><td>To upgrade (new model)</td><td>After model refresh announcement — before it hits lots</td><td>Old model values hold briefly; new-model curiosity raises used demand</td></tr>
+<tr><td>High mileage alert</td><td>Before 100K miles for gas trucks</td><td>Financing harder and more expensive for buyers over 100K</td></tr>
+<tr><td>Diesel — long term</td><td>Can push to 200K–300K miles if maintained</td><td>Cummins/Duramax trucks sell at high mileage with strong values</td></tr>
+<tr><td>Current vehicle trade-in</td><td>Before buying — check Edmunds TMV, CarGurus</td><td>KBB lags real market by 30–60 days; private sale usually nets 10–15% more</td></tr>
+</table>
+<p><strong>KBB vs real market:</strong> KBB lags real transaction data by 30–60 days. In a rising market KBB undervalues your truck; in a falling market it overvalues it. Use Edmunds True Market Value (TMV) as your primary reference — based on actual recent transactions in your area. CarGurus shows how your truck compares to similar active listings.</p>
+<p><strong>Private sale vs dealer trade:</strong> Private sale nets 10–15% more in most cases. On a $35,000–$50,000 truck, that is $3,500–$7,500 more in your pocket. Worth it if your schedule allows.</p>
+<p><strong>Dealer trade convenience:</strong> Instant transaction, no taxes on the trade amount in most states, no handling buyers or test drives. At a cost of roughly $3,000–$7,000 in value left on the table. A fair trade if your time is worth more than the difference.</p>
+<p><strong>Online instant offers (Carvana, CarMax, Autotrader Instant Cash Offer):</strong> Use these as your floor price baseline. Any dealer offering less than these is taking advantage of you. These offers are often competitive with dealer trades and in some cases exceed them for popular truck models.</p>`},
+
+{title:'13. Regional considerations',body:`
+<p><strong>Rust belt (Northeast, Midwest, Great Lakes — MN, MI, OH, NY, PA, WI):</strong> Frame rust is a truck-killer. Inspect undercarriage, frame, and suspension mounts on any used truck from these regions before anything else. Frame rot means the truck is scrap regardless of engine condition. Consider rustproofing (Fluid Film, Krown) on new trucks. Annual undercarriage inspection.</p>
+<p><strong>Sunbelt (Texas, Arizona, New Mexico, California):</strong> Minimal rust concerns. Texas and California are #1 and #2 in total truck thefts — factor this into your deterrent budget. UV damage to seals, plastics, and interiors — park in shade, use UV protectants.</p>
+<p><strong>High altitude (Colorado, New Mexico, Utah, Wyoming):</strong> Diesel engines lose torque at altitude — matters for mountain towing. Naturally-aspirated gas engines lose power even more. Turbocharged engines (diesel and modern gas) maintain power better at altitude.</p>
+<p><strong>California emissions:</strong> CARB rules affect diesel truck owners. Some configurations, modifications, or deleted diesels are illegal in California. EV incentives are strongest in California and Washington. Check current CARB rules before buying diesel in California.</p>
+<p><strong>Cold climate (Minnesota, Montana, Wyoming, northern states):</strong> Diesel at extreme cold (-20°F or below) requires winter additives to prevent fuel gelling. Block heaters are standard practice — essential, not optional. EV particularly challenged — 40% range loss in severe cold is well-documented.</p>
+
+<p><strong>Recall history — check before you buy:</strong> Check NHTSA.gov for the specific VIN before any used purchase. Free service. Shows all open and completed recalls. Pattern and severity matter more than count. Ford F-150 2018: highest recall burden of any recent F-150 year — engine, drivetrain, body issues. GM Silverado/Sierra all years: multiple ongoing electronics and transmission-related bulletins (not all formal recalls — many are TSBs). RAM 1500 2014: worst recall year — 22+ active NHTSA complaints and multiple recalls across multiple systems. Avoid. Toyota Tundra 2007–2008: cam tower oil sludge subject to extended warranty coverage by Toyota — verify documentation.</p>
+
+<p><strong>Comfort and daily driving reality:</strong> RAM 1500 rides the smoothest in its class — the coil-spring rear suspension and available air suspension are genuinely best-in-class for comfort. No other full-size uses this setup. Toyota Tundra (2022+) was a dramatic improvement over prior Tundras — significantly more refined. Ford F-150 offers the widest range of cab/bed configurations and most powertrain options. Interior quality is mid-tier unless you’re in Lariat or higher.</p>
+<p><strong>Crew cab vs extended cab:</strong> Crew cab (4-door) is the right choice if you ever carry rear passengers regularly. Extended cab rear seats are an afterthought on most trucks.</p>
+<p><strong>Short bed vs long bed:</strong> Long bed (8-foot) is required for full 5th-wheel gooseneck turning clearance without a slider hitch. Short bed (5.5–6.5 ft) is more manageable in parking but limits bed utility. Standard 6.5 ft is the practical compromise for most buyers.</p>`},
+
+{title:'14. Final recommendations — two verdicts',body:`
+<div class="info-box"><strong>The bottom line, before the evidence:</strong> Toyota Tundra (iForce MAX) is the best 1500-class truck overall by every objective measure — safety, reliability, theft risk, and resale. RAM 1500 is the best 1500 value. RAM 2500 with 6.7L Cummins wins the 2500 class in both scenarios. F-350 6.7L Powerstroke is the best used 3500 buy. Evidence follows.</div>
+<table class="data-table"><tr><th>Category</th><th>Money no object — best truck, period</th><th>Budget-conscious — ~$75K household income</th></tr>
+<tr><td><strong>1500-class pick</strong></td><td>Toyota Tundra TRD Pro or Capstone (iForce MAX Hybrid)</td><td>Ram 1500 Big Horn or Toyota Tundra SR5 (2–3 yr used)</td></tr>
+<tr><td>Why</td><td>Only TSP+ safety rating; lowest theft risk; hybrid efficiency; best known issues record; top resale</td><td>RAM leads RepairPal reliability; 2020–2023 well-documented; Toyota SR5 used is bulletproof</td></tr>
+<tr><td><strong>2500-class pick</strong></td><td>Ram 2500 Laramie with 6.7L Cummins Diesel</td><td>Ram 2500 Tradesman or Big Horn with Cummins (2018–2022 used)</td></tr>
+<tr><td>Why</td><td>Most legendary diesel; best torque (1,075 lb-ft HO); excellent longevity; RAM leads Big 3 in crash prevention</td><td>Same Cummins engine in lower trim = same capability at far less cost; known reliable years</td></tr>
+<tr><td><strong>3500-class pick</strong></td><td>Ram 3500 Limited DRW with High-Output Cummins</td><td>Ford F-350 XLT DRW with 6.7L Powerstroke (2015–2020 used)</td></tr>
+<tr><td>Why</td><td>Maximum towing; 1,075 lb-ft; best-in-class for 5th-wheel/gooseneck; Cummins longevity unmatched</td><td>6.7L Powerstroke (2011+) highly reliable; F-350 used market is mature with lots of options</td></tr>
+<tr><td>Gas vs diesel verdict</td><td>Diesel if towing &gt;15K lbs regularly — economics justify it</td><td>Gas if towing &lt;10K lbs occasionally — simpler, cheaper, easier to maintain</td></tr>
+<tr><td>New vs used verdict</td><td>New — full warranty, latest safety tech, OEM incentives when available</td><td>2–3 year used — let first owner absorb depreciation; proven year</td></tr>
+<tr><td>Lease vs buy verdict</td><td>Buy — work-truck use makes leasing impractical</td><td>Buy — lease wear-and-tear fees will sting</td></tr>
+<tr><td>Theft deterrent budget</td><td>$300–$500 (OBD lock + kill switch + GPS + Faraday)</td><td>$60–$100 (Faraday pouch + OBD lock + Club)</td></tr>
+<tr><td>First aftermarket add</td><td>Transmission cooler + air bag helper springs (if towing)</td><td>Transmission cooler ($200–$400 installed) — single best protection investment</td></tr>
+<tr><td>Trade-in timing</td><td>Year 4–6; before major service intervals; spring/summer</td><td>Year 5–7 post-payoff; drive it payment-free as long as reliable</td></tr>
+</table>
+<p><strong>The economic argument on luxury trim trucks:</strong> A $90,000 Denali Ultimate loses $18,000–$22,000 in value in year one. A $55,000 mid-trim loses $9,000–$12,000. The Cummins diesel in a Ram Laramie ($68,000) provides identical towing to the same engine in a Ram Limited ($85,000). You are paying $17,000 for leather and trim — not capability. <strong>Where premium trucks justify cost:</strong> If daily use involves executives, clients, or job site presence where a premium appearance has real business value — then the Denali, Platinum, or Longhorn has a function beyond the cool factor. Otherwise, upper-mid trim is the rational ceiling. Recommendation: spend the premium on the right capability (right engine, right class, right tow package) and stop one trim below full-luxury. Put the $10,000–$15,000 difference into preventive aftermarket upgrades and theft deterrents.</p>
+<p><strong>Budget-conscious core principles:</strong> Buy 2–3 years used — a 2022 Ram 1500 Big Horn is functionally identical to a 2025 at $12,000–$18,000 less. Never buy the first year of a redesign. Finance at 48–60 months; shop credit union rates before going to the dealer (typically 1–2% lower). Mid-trim is the value zone — XLT, LT, Big Horn, SR5 have everything most buyers actually use. First purchase after buying: transmission cooler ($200–$400 installed) if you tow at all, then OBD port lock ($30) and Faraday key pouch ($15).</p>
+<p><strong>Using this guide in the future:</strong> Update Section 2 tables with current model year options annually. Check IIHS.org directly for current crash test results. Re-run NICB/HLDI theft data. Check current OEM incentive rates and regional EV incentives. Most recent 1–2 model years will lack sufficient owner data to confidently rate — factor this in.</p>`}
+];
+
+const ROADMAP_ITEMS=[
+{status:'done',title:'Full-size truck research document',desc:'13 sections, IIHS/NICB data, real-world economics',tab:'guide'},
+{status:'done',title:'Backend server',desc:'Live on Render.com — rate limiting, CORS, Anthropic proxy',tab:null},
+{status:'done',title:'SCOUT web app v1',desc:'Scorecard with 8 categories, charts, VIN, VERA, full 14-section guide',tab:'scorecard'},
+{status:'next',title:'GitHub deployment',desc:'Go live at hookmeistr.github.io/SCOUT',tab:null},
+{status:'next',title:'Midsize truck category',desc:'Tacoma, Colorado, Ranger, Frontier — same framework',tab:'guide'},
+{status:'future',title:'Full-size SUV category',desc:'Tahoe, 4Runner, Explorer, Highlander, Sequoia',tab:null},
+{status:'future',title:'Supporter tier ($7 one-time)',desc:'20 AI credits, refills 5/day, no account needed',tab:null},
+{status:'future',title:'Pro tier',desc:'Unlimited, cross-device sync, full account',tab:null},
+{status:'future',title:'3-row family SUVs',desc:'Sequoia, Suburban, Expedition, Atlas, Pilot',tab:null},
+{status:'future',title:'Solid state battery section',desc:'Toyota 2027-2030 timeline, horizon section only',tab:'guide'}
+];
+
+let currentSort={col:null,asc:true},viewMode='summary',toggleCount=0,currentProfile=null,savedScrollPos=0,costChart=null,tcoChart=null;
+
+function lsGet(k,def){try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):def}catch{return def}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+function getRateData(){const now=Date.now();let data=lsGet('scout_rate',{rescout:[],vin:[]});const w=24*60*60*1000;data.rescout=(data.rescout||[]).filter(t=>now-t<w);data.vin=(data.vin||[]).filter(t=>now-t<w);return data}
+function useRateSlot(type){const data=getRateData();data[type].push(Date.now());lsSet('scout_rate',data)}
+function rateRemaining(type){return Math.max(0,3-getRateData()[type].length)}
+function rateResetMs(type){const data=getRateData();if(!data[type].length)return 0;const oldest=Math.min(...data[type]);return Math.max(0,(oldest+24*60*60*1000)-Date.now())}
+function updateRateBar(){
+  const rs=rateRemaining('rescout'),vs=rateRemaining('vin'),resetMs=rateResetMs('rescout');
+  let resetStr='';
+  if((rs===0||vs===0)&&resetMs>0){const h=Math.floor(resetMs/3600000),m=Math.floor((resetMs%3600000)/60000);resetStr=` \u2014 resets in ${h}h ${m}m`}
+  document.getElementById('rate-bar-text').textContent=`Re-SCOUTs: ${rs}/3 remaining \xb7 VIN scans: ${vs}/3 remaining${resetStr}`;
+  document.getElementById('set-rescout-count').textContent=3-rs;
+  document.getElementById('set-vin-count').textContent=3-vs;
+  document.getElementById('vin-uses').textContent=vs;
+}
+
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('profile-page').classList.remove('active');
+  document.getElementById('main').style.display='block';
+  const tabEl=document.querySelector(`[onclick="showTab('${name}')"]`);
+  if(tabEl)tabEl.classList.add('active');
+  const panel=document.getElementById(`tab-${name}`);
+  if(panel)panel.classList.add('active');
+  if(name==='charts')initCharts();
+  if(name==='settings')updateSettingsUI();
+  if(name==='vera')pingServer();
+  updateRateBar();
+}
+
+function initViewMode(){const saved=lsGet('scout_view',null);if(saved){viewMode=saved;return}viewMode=window.innerWidth>=1024?'detail':'summary'}
+function toggleViewMode(){viewMode=viewMode==='summary'?'detail':'summary';lsSet('scout_view',viewMode);toggleCount++;updateViewBadge();if(currentProfile)updateProfileView();if(toggleCount>=4)showNudge()}
+function updateViewBadge(){
+  document.getElementById('view-badge').textContent=viewMode==='summary'?'\ud83d\udccb Summary \u2014 tap to switch':'\ud83d\udcc4 Full detail \u2014 tap to switch';
+  const label=document.getElementById('view-mode-label');if(label)label.textContent=viewMode==='summary'?'Summary':'Full Detail';
+  const link=document.getElementById('view-switch-link');if(link)link.textContent=viewMode==='summary'?'Switch to Full Detail':'Switch to Summary';
+}
+function setViewDefault(mode){viewMode=mode;lsSet('scout_view',mode);updateViewBadge();updateSettingsUI()}
+function showNudge(){if(lsGet('scout_nudge_dismissed',false))return;document.getElementById('nudge-toast').classList.add('show')}
+function hideNudge(){document.getElementById('nudge-toast').classList.remove('show');lsSet('scout_nudge_dismissed',true)}
+function gradeClass(g){return `grade grade-${g}`}
+function gradeVal(g){return{A:4,B:3,C:2,D:1,F:0}[g]||0}
+function formatTs(ts){return new Date(ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})}
+
+function renderScorecard(){
+  const body=document.getElementById('scorecard-body');
+  const saved=lsGet('scout_rescout_ts',{});
+  let trucks=[...TRUCKS];
+  if(currentSort.col){trucks.sort((a,b)=>{
+    let va=currentSort.col==='name'?a.name:gradeVal(a.grades[currentSort.col]);
+    let vb=currentSort.col==='name'?b.name:gradeVal(b.grades[currentSort.col]);
+    return currentSort.asc?(va<vb?-1:va>vb?1:0):(va>vb?-1:va<vb?1:0);
+  })}
+  body.innerHTML=trucks.map(truck=>{
+    const ts=saved[truck.id]?`<div class="timestamp">SCOUTed ${formatTs(saved[truck.id])}</div>`:'';
+    const grades=CATS.map(cat=>{
+      const g=truck.grades[cat];
+      const text=truck.summary[cat]||'';
+      const isLong=text.length>280;
+      if(isLong)return `<td><button class="${gradeClass(g)}" onclick="openModal('${truck.id}','${cat}')">${g}</button></td>`;
+      return `<td><button class="${gradeClass(g)}" onclick="toggleInline('${truck.id}-${cat}')">${g}</button><div class="inline-detail" id="inline-${truck.id}-${cat}">${text}</div></td>`;
+    }).join('');
+    return `<tr><td><input type="checkbox" class="rescout-check" value="${truck.id}"><span class="truck-name-cell" onclick="openProfile('${truck.id}')">${truck.name}</span><div class="text-muted" style="font-size:11px">${truck.class}-series</div>${ts}</td>${grades}<td><button class="btn btn-secondary" style="font-size:11px;padding:4px 6px" onclick="rescoutSingle('${truck.id}')">\u21bb Scout</button></td></tr>`;
+  }).join('');
+}
+
+function toggleInline(id){const el=document.getElementById(`inline-${id}`);if(el)el.classList.toggle('open')}
+function sortTable(col){if(currentSort.col===col)currentSort.asc=!currentSort.asc;else{currentSort.col=col;currentSort.asc=true}renderScorecard()}
+function toggleAllSelect(){const checks=document.querySelectorAll('.rescout-check');const anyUnchecked=[...checks].some(c=>!c.checked);checks.forEach(c=>c.checked=anyUnchecked)}
+
+function openModal(truckId,cat){
+  const truck=TRUCKS.find(t=>t.id===truckId);if(!truck)return;
+  document.getElementById('modal-title').textContent=`${truck.name} \u2014 ${CAT_LABELS[cat]||cat}`;
+  const text=viewMode==='detail'&&truck.detail[cat]?truck.detail[cat]:truck.summary[cat];
+  document.getElementById('modal-body').innerHTML=`<p>${text}</p>${viewMode==='summary'&&truck.detail[cat]?'<p style="margin-top:10px;font-size:12px;color:var(--text-muted)">Switch to Full Detail for more depth.</p>':''}`;
+  document.getElementById('grade-modal').classList.add('open');
+}
+function closeModal(){document.getElementById('grade-modal').classList.remove('open')}
+
+function openProfile(truckId){
+  const truck=TRUCKS.find(t=>t.id===truckId);if(!truck)return;
+  currentProfile=truckId;savedScrollPos=window.scrollY;
+  document.getElementById('main').style.display='none';
+  const pp=document.getElementById('profile-page');pp.classList.add('active');pp.scrollTop=0;window.scrollTo(0,0);
+  document.getElementById('profile-name').textContent=truck.name;
+  document.getElementById('profile-subhead').textContent=`${truck.class}-series pickup \xb7 Full SCOUT profile`;
+  document.getElementById('profile-grades').innerHTML=CATS.map(cat=>{
+    const g=truck.grades[cat];
+    return `<div class="profile-grade-item"><div class="profile-grade-label">${CAT_SHORT[cat]}</div><div class="${gradeClass(g)} profile-grade-badge">${g}</div></div>`;
+  }).join('');
+  updateProfileView();
+}
+function updateProfileView(){
+  if(!currentProfile)return;
+  const truck=TRUCKS.find(t=>t.id===currentProfile);if(!truck)return;
+  updateViewBadge();
+  document.getElementById('profile-content').innerHTML=CATS.map(cat=>{
+    const g=truck.grades[cat];
+    const text=(viewMode==='detail'&&truck.detail[cat])?truck.detail[cat]:truck.summary[cat];
+    return `<div class="card"><div class="profile-section-title">${CAT_LABELS[cat]}</div><div style="display:flex;gap:10px;align-items:flex-start"><div class="${gradeClass(g)}" style="flex-shrink:0;width:34px;height:34px;font-size:15px">${g}</div><p style="font-size:14px;line-height:1.65">${text}</p></div></div>`;
+  }).join('');
+}
+function closeProfile(){
+  currentProfile=null;
+  document.getElementById('profile-page').classList.remove('active');
+  document.getElementById('main').style.display='block';
+  showTab('scorecard');
+  setTimeout(()=>window.scrollTo(0,savedScrollPos),50);
+}
+
+async function rescoutSingle(truckId){
+  if(rateRemaining('rescout')<=0){const ms=rateResetMs('rescout');const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000);alert(`3 of 3 re-SCOUTs used. Resets in ${h}h ${m}m.`);return}
+  const truck=TRUCKS.find(t=>t.id===truckId);if(!truck)return;
+  useRateSlot('rescout');updateRateBar();
+  const prompt=`Research and score the ${truck.name} (${truck.class}-series pickup truck) for a SCOUT report. SCOUT evaluates trucks across 8 categories. Return ONLY a JSON object (no markdown, no explanation):
+{"summary":"2-3 sentence overall assessment — direct and honest","grades":{"reliability":"A|B|C|D|F","ownership_cost":"A|B|C|D|F","known_issues":"A|B|C|D|F (A=very clean record, F=serious documented failure modes)","towing":"A|B|C|D|F","safety":"A|B|C|D|F (based on IIHS and NHTSA data)","theft_risk":"A|B|C|D|F (A=low risk, F=extremely high risk)","value":"A|B|C|D|F","availability":"A|B|C|D|F"},"notes":"Current model year issues, recalls, market conditions — anything buyer needs to know now"}
+Use: IIHS safety data, NICB/HLDI theft statistics, RepairPal reliability scores, NHTSA recall data, owner forums, real-world maintenance records. Do NOT use manufacturer marketing.`;
+  try{
+    const res=await fetch(`${BACKEND}/api/scout`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
+    const data=await res.json();
+    if(data.result){
+      let parsed;try{parsed=JSON.parse(data.result.replace(/```json|```/g,'').trim())}catch{parsed=null}
+      const ts=lsGet('scout_rescout_ts',{});ts[truckId]=Date.now();lsSet('scout_rescout_ts',ts);
+      if(parsed&&parsed.grades)Object.assign(truck.grades,parsed.grades);
+      renderScorecard();
+      openModal(truckId,'reliability');
+      document.getElementById('modal-title').textContent=`${truck.name} \u2014 Re-SCOUTed`;
+      document.getElementById('modal-body').innerHTML=`<p><strong>AI research result:</strong></p><p style="margin-top:8px">${parsed?parsed.summary||'Grades updated.':data.result.slice(0,200)}</p>${parsed&&parsed.notes?`<p style="margin-top:10px;color:var(--text-muted);font-size:13px"><strong>Notes:</strong> ${parsed.notes}</p>`:''}<p style="margin-top:12px;font-size:12px;color:var(--text-muted)"><span class="info-pill">\ud83e\udd16 AI-researched</span> All 8 grades updated. Refresh page to reset to baseline.</p>`;
+    }
+  }catch(e){alert('Re-SCOUT failed. Check your connection and try again.')}
+}
+
+async function batchRescout(){
+  const checked=[...document.querySelectorAll('.rescout-check:checked')].map(c=>c.value);
+  if(!checked.length){alert('Select at least one truck to re-SCOUT.');return}
+  if(checked.length>2&&!confirm(`Re-SCOUTing ${checked.length} trucks uses ${checked.length} of your 3 daily credits. Select only serious contenders. Continue?`))return;
+  if(rateRemaining('rescout')<checked.length){alert(`Not enough re-SCOUT credits. You have ${rateRemaining('rescout')} remaining.`);return}
+  for(const id of checked)await rescoutSingle(id);
+}
+
+async function handleVinPhoto(input){
+  if(!input.files||!input.files[0])return;
+  if(rateRemaining('vin')<=0){const ms=rateResetMs('vin');const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000);alert(`3 of 3 VIN photo scans used. Resets in ${h}h ${m}m. Use manual entry.`);return}
+  const file=input.files[0];
+  const btn=document.getElementById('vin-camera-btn');
+  btn.innerHTML='<span style="font-size:30px">\u23f3</span><span>Reading VIN&hellip;</span>';
+  const reader=new FileReader();
+  reader.onload=async(e)=>{
+    const base64=e.target.result.split(',')[1];
+    const mediaType=file.type||'image/jpeg';
+    useRateSlot('vin');updateRateBar();
+    try{
+      const res=await fetch(`${BACKEND}/api/vin`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:base64,mediaType})});
+      const data=await res.json();
+      if(data.vin){document.getElementById('vin-manual').value=data.vin;await lookupVin(data.vin,true)}
+      else showVinResult('error','Could not read VIN clearly. Please use manual entry below.');
+    }catch{showVinResult('error','Photo scan failed. Please enter VIN manually.')}
+    btn.innerHTML='<span style="font-size:30px">\ud83d\udcf7</span><span>Tap to photograph VIN plate</span><span style="font-size:11px;font-weight:400;color:var(--text-muted)">Claude AI reads VIN from photo</span>';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function lookupVin(vin,fromPhoto){
+  vin=(vin||'').trim().toUpperCase();
+  if(vin.length!==17){showVinResult('error','VIN must be exactly 17 characters.');return}
+  showVinResult('loading','Looking up VIN via NHTSA&hellip;');
+  try{
+    const res=await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${vin}?format=json`);
+    const data=await res.json();
+    const results=data.Results;
+    const get=(v)=>{const r=results.find(x=>x.Variable===v);return r&&r.Value&&r.Value!=='Not Applicable'?r.Value:null};
+    const make=get('Make'),model=get('Model'),year=get('Model Year'),bodyClass=get('Body Class'),plant=get('Plant Country'),fuel=get('Fuel Type - Primary'),drive=get('Drive Type');
+    let recallHtml='';
+    try{
+      const rres=await fetch(`https://api.nhtsa.gov/recalls/recallsByVehicle?make=${make}&model=${model}&modelYear=${year}`);
+      const rdata=await rres.json();
+      const recalls=rdata.results||[];
+      if(recalls.length>0){recallHtml=`<div style="margin-top:10px;padding:8px;background:#fccece;border-radius:6px;font-size:13px"><strong>\u26a0\ufe0f ${recalls.length} open recall(s) found</strong><br>${recalls.slice(0,2).map(r=>`\u2022 ${r.Component}: ${r.Summary?r.Summary.slice(0,120)+'&hellip;':'See NHTSA for details'}`).join('<br>')}${recalls.length>2?`<br><a href="https://www.nhtsa.gov/vehicle-safety/recalls#recall--search-by-vin" target="_blank" style="color:var(--bad)">View all ${recalls.length} recalls &rarr;</a>`:''}</div>`}
+      else recallHtml=`<div style="margin-top:10px;padding:8px;background:var(--forest-light);border-radius:6px;font-size:13px;color:var(--good)">\u2713 No open recalls found</div>`;
+    }catch{}
+    let yearCheckHtml='';
+    if(make&&model&&year){
+      const key=`${make} ${model}`.toLowerCase();
+      const yd=GOOD_BAD_YEARS[key];
+      if(yd){
+        const y=parseInt(year);
+        if(yd.good.includes(y))yearCheckHtml=`<div style="margin-top:8px;padding:8px;background:var(--forest-light);border-radius:6px;font-size:13px;color:var(--good)">\u2713 ${year} is a <strong>recommended year</strong> in SCOUT's database. ${yd.notes}</div>`;
+        else if(yd.bad.includes(y))yearCheckHtml=`<div style="margin-top:8px;padding:8px;background:#fccece;border-radius:6px;font-size:13px;color:var(--bad)">\u26a0\ufe0f ${year} is a <strong>flagged year</strong> in SCOUT's database. ${yd.notes}</div>`;
+        else yearCheckHtml=`<div style="margin-top:8px;padding:8px;background:#fef3cc;border-radius:6px;font-size:13px">\u2139\ufe0f ${year} is a neutral year in SCOUT's database. ${yd.notes}</div>`;
+      }
+    }
+    showVinResult('success',`<strong style="font-size:15px">${year||'?'} ${make||'?'} ${model||'?'}</strong><br><span style="font-size:13px;color:var(--text-muted)">${bodyClass?bodyClass+' &middot; ':''}${fuel||''}${drive?' &middot; '+drive:''}${plant?' &middot; Made in '+plant:''}</span>${yearCheckHtml}${recallHtml}<div style="margin-top:10px;font-size:12px;color:var(--text-muted)">Source: NHTSA &middot; VIN: ${vin}${fromPhoto?' &middot; Read by Claude AI':''}</div>`);
+  }catch{showVinResult('error','NHTSA lookup failed. Check your connection and try again.')}
+}
+
+function showVinResult(type,html){
+  const el=document.getElementById('vin-result');el.classList.add('active');
+  if(type==='loading'){el.style.background='#f0ede8';el.style.border='1px solid #d0ccc4'}
+  else if(type==='error'){el.style.background='#fccece';el.style.border='1px solid var(--bad)'}
+  else{el.style.background='var(--forest-light)';el.style.border='1px solid var(--forest-mid)'}
+  el.innerHTML=html;
+}
+
+let serverWarmedUp=false;
+function pingServer(){
+  if(serverWarmedUp)return;
+  fetch(`${BACKEND}/ping`).then(()=>{serverWarmedUp=true;}).catch(()=>{});
+}
+function veraQuickPrompt(btn){document.getElementById('vera-input').value=btn.textContent;sendVera()}
+async function sendVera(){
+  const input=document.getElementById('vera-input');
+  const query=input.value.trim();if(!query)return;
+  input.value='';
+  appendVeraMsg('user',query);
+  const thinking=appendVeraMsg('vera','Working on it\u2026','thinking');
+  let retries=0;
+  const tryFetch=async()=>{
+    try{
+      const res=await fetch(`${BACKEND}/api/vera`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,context:`User researching pickup trucks. SCOUT database: ${TRUCKS.map(t=>t.name).join(', ')}. SCOUT evaluates 8 categories: reliability, ownership cost, known issues, towing, safety, theft risk, value, availability.`})});
+      if(!res.ok)throw new Error('not ok');
+      const data=await res.json();
+      thinking.remove();
+      appendVeraMsg('vera',data.result||'Something went wrong. Try again.');
+    }catch{
+      if(retries<2){
+        retries++;
+        const delay=retries===1?30000:15000;
+        thinking.textContent=retries===1?'Server is waking up \u2014 this takes about 30 seconds on first use\u2026':'Almost there\u2026';
+        setTimeout(tryFetch,delay);
+      }else{thinking.remove();appendVeraMsg('vera','Server is not responding. This usually means it\u2019s still starting up \u2014 wait 30 seconds and try again.');}
+    }
+  };
+  tryFetch();
+}
+function appendVeraMsg(role,text,cls){
+  const chat=document.getElementById('vera-chat');
+  const div=document.createElement('div');
+  div.className=`vera-msg ${role}${cls?' '+cls:''}`;
+  div.textContent=text;
+  chat.appendChild(div);
+  chat.scrollTop=chat.scrollHeight;
+  return div;
+}
+
+function initCharts(){
+  if(costChart)return;
+  const names=TRUCKS.map(t=>t.name.replace('Chevy ','').replace(' 1500','').replace(' 2500 HD',' HD').replace(' Super Duty',' SD'));
+  const colors=['#2b7bb9','#c97d1a','#2d6a4f','#1e7145','#b03030','#5a3e9e','#856400'];
+  costChart=new Chart(document.getElementById('cost-chart'),{type:'bar',data:{labels:names,datasets:[{label:'Annual cost ($)',data:TRUCKS.map(t=>t.annualCost),backgroundColor:colors,borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'$'+v.toLocaleString()}}}}});
+  tcoChart=new Chart(document.getElementById('tco-chart'),{type:'bar',data:{labels:names,datasets:[{label:'5-year TCO ($)',data:TRUCKS.map(t=>t.tco5yr),backgroundColor:colors,borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'$'+v.toLocaleString()}}}}});
+  renderCompareTable();
+}
+function renderCompareTable(){
+  const table=document.getElementById('compare-table');
+  const headerRow=`<thead><tr><th>Category</th>${TRUCKS.map(t=>`<th>${t.name.replace('Chevy ','').replace(' 1500','').replace(' 2500 HD',' HD').replace(' Super Duty',' SD')}</th>`).join('')}</tr></thead>`;
+  const bodyRows=CATS.map(cat=>`<tr><td>${CAT_SHORT[cat]}</td>${TRUCKS.map(t=>`<td><span class="cg cg-${t.grades[cat]}">${t.grades[cat]}</span></td>`).join('')}</tr>`).join('');
+  table.innerHTML=headerRow+`<tbody>${bodyRows}</tbody>`;
+}
+
+function renderGuide(){
+  document.getElementById('guide-sections').innerHTML=GUIDE_SECTIONS.map((s,i)=>`
+    <div class="guide-section">
+      <div class="guide-header" onclick="toggleGuide(${i})"><span>${s.title}</span><span class="guide-arrow" id="guide-arrow-${i}">\u25b6</span></div>
+      <div class="guide-body" id="guide-body-${i}">${s.body}</div>
+    </div>`).join('');
+}
+function toggleGuide(i){
+  const body=document.getElementById(`guide-body-${i}`);
+  const arrow=document.getElementById(`guide-arrow-${i}`);
+  const open=body.classList.contains('open');
+  body.classList.toggle('open',!open);
+  arrow.style.transform=open?'':'rotate(90deg)';
+}
+
+function renderRoadmap(){
+  document.getElementById('roadmap-list').innerHTML=ROADMAP_ITEMS.map(item=>`
+    <div class="roadmap-item" onclick="${item.tab?`showTab('${item.tab}')`:''}" style="${item.tab?'cursor:pointer':'cursor:default'}">
+      <div class="roadmap-dot dot-${item.status}"></div>
+      <div class="roadmap-text"><h4>${item.title}${item.tab?' <span style="font-size:11px;color:var(--sky)">&rarr; tap to view</span>':''}</h4><p>${item.desc}</p></div>
+    </div>`).join('');
+}
+
+function updateSettingsUI(){
+  document.getElementById('set-summary').classList.toggle('active',viewMode==='summary');
+  document.getElementById('set-detail').classList.toggle('active',viewMode==='detail');
+  updateRateBar();
+}
+function setLayout(mode){['auto','phone','tablet','desktop'].forEach(m=>document.getElementById(`layout-${m}`).classList.toggle('active',m===mode));lsSet('scout_layout',mode)}
+function clearAllData(){
+  if(!confirm('Clear all saved data? This cannot be undone.'))return;
+  ['scout_view','scout_rate','scout_rescout_ts','scout_nudge_dismissed','scout_layout','scout_browser_ok'].forEach(k=>localStorage.removeItem(k));
+  alert('All data cleared.');updateRateBar();updateSettingsUI();renderScorecard();
+}
+function checkBrowserNotice(){if(!lsGet('scout_browser_ok',false))document.getElementById('browser-notice').classList.add('show')}
+function dismissBrowserNotice(){lsSet('scout_browser_ok',true);document.getElementById('browser-notice').classList.remove('show')}
+
+function injectManifest(){
+  const manifest={name:'SCOUT \u2014 Vehicle Research',short_name:'SCOUT',description:'Smart Comparison & Ownership Understanding Tool',start_url:'.',display:'standalone',background_color:'#1e4d2b',theme_color:'#1e4d2b',icons:[{src:'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="32" fill="#1e4d2b"/><path d="M96 16 L168 48 L168 112 Q168 160 96 184 Q24 160 24 112 L24 48 Z" stroke="#c97d1a" stroke-width="6" fill="none"/><line x1="56" y1="168" x2="96" y2="40" stroke="#c97d1a" stroke-width="8" stroke-linecap="round"/><line x1="136" y1="168" x2="96" y2="40" stroke="#c97d1a" stroke-width="8" stroke-linecap="round"/><line x1="96" y1="168" x2="96" y2="120" stroke="#c97d1a" stroke-width="5" stroke-dasharray="10,10" stroke-linecap="round"/><circle cx="96" cy="40" r="10" fill="#c97d1a"/></svg>'),sizes:'192x192',type:'image/svg+xml'}]};
+  const blob=new Blob([JSON.stringify(manifest)],{type:'application/json'});
+  document.getElementById('manifest-link').href=URL.createObjectURL(blob);
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  injectManifest();initViewMode();updateViewBadge();renderScorecard();renderGuide();renderRoadmap();updateRateBar();checkBrowserNotice();
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();if(currentProfile)closeProfile()}});
+});
+</script>
+</body>
+</html>
