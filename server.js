@@ -6,13 +6,23 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
-// CORS — only allow requests from GitHub Pages frontend
+// CORS — allow GitHub Pages, local dev, and local file opens (null origin)
 app.use(cors({
-  origin: [
-    'https://hookmeistr.github.io',
-    'http://localhost:3000',
-    'http://127.0.0.1:5500' // for local dev testing
-  ],
+  origin: function(origin, callback) {
+    const allowed = [
+      'https://hookmeistr.github.io',
+      'http://localhost:3000',
+      'http://127.0.0.1:5500',
+      'http://localhost:5500',
+      'http://localhost:8080',
+    ];
+    // Allow null origin (file:// direct opens) and listed origins
+    if (!origin || allowed.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type']
 }));
@@ -43,6 +53,11 @@ const freeLimiter = rateLimit({
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'scout-api' });
+});
+
+// Ping endpoint — used by frontend to wake server before first request
+app.get('/ping', (req, res) => {
+  res.json({ alive: true });
 });
 
 // Re-SCOUT endpoint — runs AI research on a truck
