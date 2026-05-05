@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,26 +10,9 @@ app.use(cors());
 
 app.use(express.json({ limit: '10mb' })); // 10mb to handle base64 VIN photos
 
-// Free tier rate limiter — 3 requests per 24 hours per IP
-const freeLimiter = rateLimit({
-  windowMs: 24 * 60 * 60 * 1000, // 24 hours
-  max: 3,
-  standardHeaders: true,
-  legacyHeaders: false,
-  keyGenerator: (req) => req.ip,
-  handler: (req, res) => {
-    const resetTime = new Date(req.rateLimit.resetTime);
-    const now = new Date();
-    const msUntilReset = resetTime - now;
-    const hoursLeft = Math.floor(msUntilReset / (1000 * 60 * 60));
-    const minutesLeft = Math.floor((msUntilReset % (1000 * 60 * 60)) / (1000 * 60));
-    res.status(429).json({
-      error: 'rate_limit',
-      message: `3 of 3 re-SCOUTs used. Resets in ${hoursLeft}h ${minutesLeft}m.`,
-      resetIn: msUntilReset
-    });
-  }
-});
+// Rate limiting disabled during development
+// TODO: Re-add per-endpoint rate limiting when public launch occurs
+// When added back, developer/admin accounts must be permanently exempt without paid subscription
 
 // Health check
 app.get('/health', (req, res) => {
@@ -43,7 +25,7 @@ app.get('/ping', (req, res) => {
 });
 
 // Re-SCOUT endpoint — runs AI research on a truck
-app.post('/api/scout', freeLimiter, async (req, res) => {
+app.post('/api/scout', async (req, res) => {
   const { prompt, trucks } = req.body;
 
   if (!prompt && !trucks) {
@@ -93,7 +75,7 @@ Include a brief summary for each truck. Base scores on current real-world data.`
 });
 
 // VIN photo endpoint — Claude vision reads VIN from photo
-app.post('/api/vin', freeLimiter, async (req, res) => {
+app.post('/api/vin', async (req, res) => {
   const { image, mediaType } = req.body;
 
   if (!image) {
@@ -158,7 +140,7 @@ app.post('/api/vin', freeLimiter, async (req, res) => {
 });
 
 // VERA open query endpoint
-app.post('/api/vera', freeLimiter, async (req, res) => {
+app.post('/api/vera', async (req, res) => {
   const { query, context } = req.body;
 
   if (!query) {
