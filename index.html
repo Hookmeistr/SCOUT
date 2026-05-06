@@ -108,7 +108,6 @@ td:first-child{text-align:left}
 .vera-msg.user{background:var(--forest-mid);color:#fff;align-self:flex-end;border-radius:10px 10px 3px 10px}
 .vera-msg.vera{background:#fff;border:1px solid var(--border);align-self:flex-start;border-radius:10px 10px 10px 3px}
 .vera-msg.thinking{color:var(--text-muted);font-style:italic;background:#fff;border:1px solid var(--border);align-self:flex-start}
-.vera-msg.waking{color:#8a4400;font-style:italic;background:#fff3cd;border:1px solid var(--amber);align-self:flex-start;font-weight:600}
 .vera-input-row{display:flex;gap:8px}
 #vera-input{flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none}
 #vera-input:focus{border-color:var(--forest-mid)}
@@ -285,8 +284,7 @@ td:first-child{text-align:left}
 <div class="tab-panel" id="tab-guide">
 <div style="margin-bottom:12px">
 <h2 style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--forest-dark);margin-bottom:4px;">Pickup truck buyer's guide</h2>
-<p class="section-intro">Real-world research &mdash; not manufacturer marketing. Use this before you set foot on a lot. Data from IIHS, NICB, HLDI, NHTSA, RepairPal, J.D. Power, Consumer Reports, Reddit truck forums, The Diesel Stop, PowerStroke Nation, GM-Trucks.com, Jalopnik, MotorTrend, and owner communities. Last updated May 2026.</p>
-<div class="info-box"><strong>Price research note:</strong> KBB consistently lags real transaction prices by 30&ndash;60 days. For selling: use Edmunds True Market Value (TMV) and CarGurus for actual recent transaction prices. For buying used: check Manheim auction data if accessible, or cross-reference Autotrader and Cars.com for what trucks are actually selling for versus listed at.</div>
+<p class="section-intro">Real-world research &mdash; not manufacturer marketing. Use this before you set foot on a lot. Data from IIHS, NICB, HLDI, NHTSA, RepairPal, J.D. Power, Consumer Reports, and owner communities. Last updated May 2026.</p>
 </div>
 <div id="guide-sections"></div>
 </div>
@@ -540,7 +538,7 @@ const GUIDE_SECTIONS=[
 <p><strong>Cost reality:</strong> EVs have very low fuel and maintenance costs but higher purchase prices, higher insurance, and a rapidly changing resale market. A 2023 F-150 Lightning has already lost 35–45% of its value — the EV used market is volatile.</p>
 <div class="warn-box"><strong>Charging infrastructure gap:</strong> Outside of metro areas, DC fast chargers capable of handling a truck with a trailer are still sparse. Being stranded 200 miles from nowhere with a dead truck is not acceptable for anyone using a truck as a primary work or travel vehicle.</div>
 
-<div class="info-box"><strong>Solid-state batteries (horizon only — no buying implication):</strong> Toyota confirmed production approval in Japan (October 2025), targeting first vehicle 2027, mass production 2029–2030. Claimed specs: 600–1,000+ mile range, 10-minute 10–80% charge. But the timeline has slipped from 2020 to 2023 to 2026 to now. A viable solid-state work truck is 8–12+ years out. <strong>Buying implication:</strong> If you are considering delaying a truck purchase to wait for solid-state EV trucks, the practical timeline does not support waiting. Buy the right diesel or hybrid for your needs now. Revisit in 2030–2032 for the EV truck market.</div>`},
+<div class="info-box"><strong>Solid-state batteries (horizon only — no buying implication):</strong> Toyota confirmed production approval in Japan (October 2025), targeting first vehicle 2027, mass production 2029–2030. Claimed specs: 600–1,000+ mile range, 10-minute 10–80% charge. But the timeline has slipped from 2020 to 2023 to 2026 to now. A viable solid-state work truck is 8–12+ years out. Buy the right diesel or hybrid for your needs now.</div>`},
 
 {title:'2. Truck classes — 1500 / 2500 / 3500',body:`
 <p>These three classes are fundamentally different vehicles that happen to share the word "truck." Comparing a 1500 to a 3500 is like comparing a minivan to a semi. Each class is evaluated on its own terms.</p>
@@ -570,7 +568,7 @@ const GUIDE_SECTIONS=[
 <p><strong>Class 3500 — Maximum Duty (One-Ton)</strong></p>
 <p>Commercial-territory equipment. Over 70% of 3500s are sold diesel. Only buy if you genuinely need 20,000+ lb capacity.</p>
 <table class="data-table"><tr><th>Model</th><th>Max tow 5th-wheel</th><th>Configuration notes</th><th>Reliability note</th></tr>
-<tr><td>Ford F-350 Super Duty (DRW diesel)</td><td>43,000 lbs</td><td>SRW and DRW; commercial use; real-world safe sustained: 30,000–36,000 lbs</td><td>6.7L 2011+ is excellent</td></tr>
+<tr><td>Ford F-350 Super Duty (DRW diesel)</td><td>43,000 lbs</td><td>SRW and DRW; commercial use</td><td>6.7L 2011+ is excellent</td></tr>
 <tr><td>Ram 3500 HO Cummins DRW</td><td>35,100+ lbs</td><td>Best diesel torque in class</td><td>1,075 lb-ft — Cummins legendary</td></tr>
 <tr><td>Chevy/GMC 3500HD Duramax DRW</td><td>36,000 lbs</td><td>Fleet and agriculture standard</td><td>L5P Duramax HO very capable</td></tr>
 </table>
@@ -713,7 +711,6 @@ const GUIDE_SECTIONS=[
 <tr><td>Insurance cost</td><td>Usually higher — lender requires lower deductibles</td><td>Lower — you choose coverage levels</td></tr>
 <tr><td>Tax (business use)</td><td>Often 100% deductible</td><td>Depreciation deductible; varies</td></tr>
 <tr><td>5-year total cost</td><td>Higher overall (continuous payments, no equity)</td><td>Lower overall if kept post-payoff</td></tr>
-<tr><td><strong>Best Scenario</strong></td><td>Drive &lt;12K mi/yr, want new truck every 3 yrs, low upfront cash</td><td>Drive &gt;15K mi/yr, keep 6+ yrs, work truck use, want equity</td></tr>
 <tr><td><strong>Verdict</strong></td><td><strong>Rarely right for work trucks</strong></td><td><strong>Almost always better long-term</strong></td></tr>
 </table>
 <p><strong>When leasing might make sense:</strong> Under 12,000 miles/year. Want a new vehicle every 2–3 years. Business use with full payment deduction. Light-duty daily driving only. Documented need to always be in new warranty (medical equipment transport, specialized tech requirements).</p>
@@ -788,7 +785,7 @@ const GUIDE_SECTIONS=[
 
 <p><strong>Recall history — check before you buy:</strong> Check NHTSA.gov for the specific VIN before any used purchase. Free service. Shows all open and completed recalls. Pattern and severity matter more than count. Ford F-150 2018: highest recall burden of any recent F-150 year — engine, drivetrain, body issues. GM Silverado/Sierra all years: multiple ongoing electronics and transmission-related bulletins (not all formal recalls — many are TSBs). RAM 1500 2014: worst recall year — 22+ active NHTSA complaints and multiple recalls across multiple systems. Avoid. Toyota Tundra 2007–2008: cam tower oil sludge subject to extended warranty coverage by Toyota — verify documentation.</p>
 
-<p><strong>Comfort and daily driving reality:</strong> RAM 1500 rides the smoothest in its class — the coil-spring rear suspension and available air suspension are genuinely best-in-class for comfort. No other full-size uses this setup. Toyota Tundra (2022+) was a dramatic improvement over prior Tundras — significantly more refined. Ford F-150 offers the widest range of cab/bed configurations and most powertrain options. Interior quality is mid-tier unless you’re in Lariat or higher.</p>
+<p><strong>Comfort and daily driving reality:</strong> RAM 1500 rides the smoothest in its class — the coil-spring rear suspension and available air suspension are genuinely best-in-class for comfort. No other full-size uses this setup. Toyota Tundra (2022+) was a dramatic improvement over prior Tundras — significantly more refined. Ford F-150 offers the widest range of cab/bed configurations and most powertrain options.</p>
 <p><strong>Crew cab vs extended cab:</strong> Crew cab (4-door) is the right choice if you ever carry rear passengers regularly. Extended cab rear seats are an afterthought on most trucks.</p>
 <p><strong>Short bed vs long bed:</strong> Long bed (8-foot) is required for full 5th-wheel gooseneck turning clearance without a slider hitch. Short bed (5.5–6.5 ft) is more manageable in parking but limits bed utility. Standard 6.5 ft is the practical compromise for most buyers.</p>`},
 
@@ -808,7 +805,7 @@ const GUIDE_SECTIONS=[
 <tr><td>First aftermarket add</td><td>Transmission cooler + air bag helper springs (if towing)</td><td>Transmission cooler ($200–$400 installed) — single best protection investment</td></tr>
 <tr><td>Trade-in timing</td><td>Year 4–6; before major service intervals; spring/summer</td><td>Year 5–7 post-payoff; drive it payment-free as long as reliable</td></tr>
 </table>
-<p><strong>The economic argument on luxury trim trucks:</strong> A $90,000 Denali Ultimate loses $18,000–$22,000 in value in year one. A $55,000 mid-trim loses $9,000–$12,000. The Cummins diesel in a Ram Laramie ($68,000) provides identical towing to the same engine in a Ram Limited ($85,000). You are paying $17,000 for leather and trim — not capability. <strong>Where premium trucks justify cost:</strong> If daily use involves executives, clients, or job site presence where a premium appearance has real business value — then the Denali, Platinum, or Longhorn has a function beyond the cool factor. Otherwise, upper-mid trim is the rational ceiling. Recommendation: spend the premium on the right capability (right engine, right class, right tow package) and stop one trim below full-luxury. Put the $10,000–$15,000 difference into preventive aftermarket upgrades and theft deterrents.</p>
+<p><strong>The economic argument on luxury trim trucks:</strong> A $90,000 Denali Ultimate loses $18,000–$22,000 in value in year one. A $55,000 mid-trim loses $9,000–$12,000. The Cummins diesel in a Ram Laramie ($68,000) provides identical towing to the same engine in a Ram Limited ($85,000). You are paying $17,000 for leather and trim — not capability. Recommendation: spend the premium on the right capability (right engine, right class, right tow package) and stop one trim below full-luxury. Put the $10,000–$15,000 difference into preventive aftermarket upgrades and theft deterrents.</p>
 <p><strong>Budget-conscious core principles:</strong> Buy 2–3 years used — a 2022 Ram 1500 Big Horn is functionally identical to a 2025 at $12,000–$18,000 less. Never buy the first year of a redesign. Finance at 48–60 months; shop credit union rates before going to the dealer (typically 1–2% lower). Mid-trim is the value zone — XLT, LT, Big Horn, SR5 have everything most buyers actually use. First purchase after buying: transmission cooler ($200–$400 installed) if you tow at all, then OBD port lock ($30) and Faraday key pouch ($15).</p>
 <p><strong>Using this guide in the future:</strong> Update Section 2 tables with current model year options annually. Check IIHS.org directly for current crash test results. Re-run NICB/HLDI theft data. Check current OEM incentive rates and regional EV incentives. Most recent 1–2 model years will lack sufficient owner data to confidently rate — factor this in.</p>`}
 ];
@@ -855,7 +852,6 @@ function showTab(name){
   if(panel)panel.classList.add('active');
   if(name==='charts')initCharts();
   if(name==='settings')updateSettingsUI();
-  if(name==='vera')pingServer();
   updateRateBar();
 }
 
@@ -1032,11 +1028,6 @@ function showVinResult(type,html){
   el.innerHTML=html;
 }
 
-let serverWarmedUp=false;
-function pingServer(){
-  if(serverWarmedUp)return;
-  fetch(`${BACKEND}/ping`).then(()=>{serverWarmedUp=true;}).catch(()=>{});
-}
 function veraQuickPrompt(btn){document.getElementById('vera-input').value=btn.textContent;sendVera()}
 async function sendVera(){
   const input=document.getElementById('vera-input');
@@ -1045,38 +1036,16 @@ async function sendVera(){
   appendVeraMsg('user',query);
   const thinking=appendVeraMsg('vera','Working on it\u2026','thinking');
   let retries=0;
-  let countdownInterval=null;
   const tryFetch=async()=>{
     try{
       const res=await fetch(`${BACKEND}/api/vera`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,context:`User researching pickup trucks. SCOUT database: ${TRUCKS.map(t=>t.name).join(', ')}. SCOUT evaluates 8 categories: reliability, ownership cost, known issues, towing, safety, theft risk, value, availability.`})});
       if(!res.ok)throw new Error('not ok');
-      if(countdownInterval){clearInterval(countdownInterval);countdownInterval=null;}
       const data=await res.json();
       thinking.remove();
       appendVeraMsg('vera',data.result||'Something went wrong. Try again.');
     }catch{
-      if(retries<2){
-        retries++;
-        if(countdownInterval){clearInterval(countdownInterval);countdownInterval=null;}
-        const delay=retries===1?30000:15000;
-        const secs=delay/1000;
-        let remaining=secs;
-        thinking.className='vera-msg waking';
-        const updateMsg=()=>{
-          thinking.textContent=`\u26a0\ufe0f Server is waking up \u2014 ${remaining}s remaining\u2026`;
-        };
-        updateMsg();
-        countdownInterval=setInterval(()=>{
-          remaining--;
-          if(remaining<=0){clearInterval(countdownInterval);countdownInterval=null;thinking.textContent='\u23f3 Almost there\u2026';thinking.className='vera-msg thinking';}
-          else updateMsg();
-        },1000);
-        setTimeout(tryFetch,delay);
-      }else{
-        if(countdownInterval){clearInterval(countdownInterval);countdownInterval=null;}
-        thinking.remove();
-        appendVeraMsg('vera','\u26a0\ufe0f Server didn\u2019t respond in time. Tap Ask again \u2014 it should be warmed up now.');
-      }
+      if(retries<2){retries++;thinking.textContent=retries===1?'Still working on it\u2026':'Almost there\u2026';setTimeout(tryFetch,8000)}
+      else{thinking.remove();appendVeraMsg('vera','Could not reach the server. Please try again in a moment.')}
     }
   };
   tryFetch();
